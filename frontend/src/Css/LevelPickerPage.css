@@ -1,0 +1,477 @@
+:root {
+  --lpp-fun:     'Baloo 2',  cursive;
+  --lpp-body:    'Nunito',   sans-serif;
+  --lpp-saffron: #FF9933;
+}
+
+/* ── Page wrapper ─────────────────────────────────────────────────── */
+.lpp-page {
+  font-family: var(--lpp-body);
+  padding-bottom: 48px;
+  box-sizing: border-box;
+}
+
+/* ── Header ───────────────────────────────────────────────────────── */
+.lpp-header {
+  position: relative;
+  overflow: hidden;
+  padding: 30px 24px 26px;
+  text-align: center;
+}
+
+.lpp-flag {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+.lpp-header-text { position: relative; }
+
+.lpp-title {
+  font-family: var(--lpp-fun);
+  font-size: clamp(1.4rem, 4vw, 2.1rem);
+  font-weight: 800;
+  margin: 0 0 6px;
+  color: #222;
+  letter-spacing: -0.4px;
+}
+
+.lpp-sub {
+  font-size: clamp(0.8rem, 2vw, 0.95rem);
+  color: #888;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* ── Grid ─────────────────────────────────────────────────────────── */
+.lpp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  gap: 28px;
+  max-width: 1400px;
+  margin: 28px auto 0;
+  padding: 0 22px;
+  box-sizing: border-box;
+}
+
+/* ── Card ─────────────────────────────────────────────────────────── */
+.lpp-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 22px 14px 14px;
+  border: 2.5px solid transparent;
+  border-radius: 22px;
+  cursor: pointer;
+  text-align: center;
+  animation: lpp-in 0.4s cubic-bezier(.34,1.56,.64,1) both;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+  transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 200px;
+}
+
+@keyframes lpp-in {
+  from { opacity: 0; transform: translateY(22px) scale(0.92); }
+  to   { opacity: 1; transform: none; }
+}
+
+.lpp-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.13);
+}
+.lpp-card:active { transform: scale(0.97); }
+
+/* Dark card variant */
+.lpp-card.dark {
+  background: linear-gradient(135deg, #1a1a2e, #16213e) !important;
+  box-shadow: 0 4px 20px rgba(214,40,40,0.2);
+}
+.lpp-card.dark:hover {
+  box-shadow: 0 14px 38px rgba(214,40,40,0.36) !important;
+  transform: translateY(-7px) scale(1.03) !important;
+}
+
+/* Card parts */
+.lpp-card-num {
+  position: absolute;
+  top: 11px; left: 11px;
+  width: 25px; height: 25px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--lpp-fun);
+  font-weight: 800;
+  font-size: 0.78rem;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.22);
+  flex-shrink: 0;
+}
+
+.lpp-card-tag {
+  position: absolute;
+  top: 11px; right: 11px;
+  padding: 2px 9px;
+  border-radius: 20px;
+  border: 1.5px solid;
+  font-family: var(--lpp-fun);
+  font-weight: 700;
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+
+.lpp-card-emoji {
+  font-size: clamp(2rem, 5vw, 2.5rem);
+  margin-top: 8px;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.14));
+  transition: transform 0.2s;
+}
+.lpp-card:hover .lpp-card-emoji { transform: scale(1.18) rotate(-5deg); }
+
+.lpp-card-title {
+  font-family: var(--lpp-fun);
+  font-size: clamp(0.82rem, 2vw, 0.96rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.lpp-card-desc {
+  font-size: clamp(0.68rem, 1.5vw, 0.74rem);
+  color: #666;
+  line-height: 1.4;
+  font-weight: 600;
+  min-height: 32px;
+}
+
+/* LevelPickerPage.css */
+.lpp-card-play {
+  margin-top: 5px;
+  padding: 6px 20px;
+  border-radius: 20px;
+  font-family: var(--lpp-fun);
+  font-weight: 800;
+  font-size: clamp(0.75rem, 2vw, 0.82rem);
+  color: white;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.55);  /* ← adds contrast on light colors */
+  filter: brightness(0.82);                  /* ← darkens all play button backgrounds */
+  box-shadow: 0 3px 10px rgba(0,0,0,0.17);
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.lpp-card:hover .lpp-card-play { opacity: 0.86; }
+
+/* ── Game page ────────────────────────────────────────────────────── */
+.lpp-game-page {
+  min-height: 100vh;
+  font-family: var(--lpp-body);
+}
+
+/* ── Top bar ──────────────────────────────────────────────────────── */
+.lpp-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: white;
+  border-bottom: 2.5px solid #f0f0f0;
+  flex-wrap: wrap;
+}
+
+.lpp-back-btn {
+  padding: 8px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 20px;
+  background: white;
+  font-family: var(--lpp-fun);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.lpp-back-btn:hover {
+  border-color: var(--lpp-saffron);
+  color: #7a4000;
+  transform: translateX(-2px);
+}
+
+.lpp-topbar-level {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--lpp-fun);
+  font-weight: 800;
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  color: #333;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lpp-topbar-jumps {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.lpp-jump-btn {
+  width: 30px; height: 30px;
+  border: 2px solid #e0e0e0;
+  border-radius: 50%;
+  background: white;
+  font-family: var(--lpp-fun);
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: #888;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s cubic-bezier(.34,1.56,.64,1);
+  flex-shrink: 0;
+}
+.lpp-jump-btn:hover {
+  transform: scale(1.22);
+  border-color: var(--lpp-saffron);
+  color: #333;
+}
+.lpp-jump-btn.active {
+  transform: scale(1.15);
+  color: white;
+  box-shadow: 0 3px 9px rgba(0,0,0,0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Large desktop: 1200px+ ───────────────────────────────────────── */
+@media (min-width: 1200px) {
+  .lpp-grid {
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 32px;
+    padding: 0 32px;
+  }
+}
+
+/* ── Medium desktop / laptop: 900px–1199px ────────────────────────── */
+@media (min-width: 900px) and (max-width: 1199px) {
+  .lpp-grid {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 24px;
+    padding: 0 24px;
+  }
+}
+
+/* ── Small tablet landscape / large tablet: 700px–899px ──────────── */
+@media (min-width: 700px) and (max-width: 899px) {
+  .lpp-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    padding: 0 18px;
+  }
+  .lpp-topbar-jumps {
+    gap: 4px;
+  }
+  .lpp-jump-btn {
+    width: 28px; height: 28px;
+    font-size: 0.78rem;
+  }
+}
+
+/* ── Tablet portrait: 480px–699px ────────────────────────────────── */
+@media (min-width: 480px) and (max-width: 699px) {
+  .lpp-header {
+    padding: 22px 16px 20px;
+  }
+  .lpp-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding: 0 14px;
+    margin-top: 20px;
+  }
+  .lpp-card {
+    padding: 18px 12px 12px;
+    border-radius: 18px;
+  }
+  .lpp-topbar-jumps {
+    display: none;
+  }
+  .lpp-topbar {
+    gap: 8px;
+  }
+}
+
+/* ── Mobile: up to 479px ──────────────────────────────────────────── */
+@media (max-width: 479px) {
+  .lpp-page {
+    padding-bottom: 32px;
+  }
+  .lpp-header {
+    padding: 18px 12px 16px;
+  }
+  .lpp-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 0 10px;
+    margin-top: 16px;
+  }
+  .lpp-card {
+    padding: 14px 10px 10px;
+    border-radius: 16px;
+    gap: 5px;
+  }
+  .lpp-card:hover {
+    transform: translateY(-3px) scale(1.02); /* gentler on touch */
+  }
+  .lpp-card-num {
+    width: 22px; height: 22px;
+    font-size: 0.7rem;
+    top: 8px; left: 8px;
+  }
+  .lpp-card-tag {
+    top: 8px; right: 8px;
+    padding: 1px 6px;
+    font-size: 0.58rem;
+  }
+  .lpp-card-emoji {
+    font-size: 1.8rem;
+    margin-top: 4px;
+  }
+  .lpp-card-play {
+    padding: 5px 14px;
+    font-size: 0.75rem;
+  }
+  .lpp-card-desc {
+    min-height: 28px;
+  }
+  .lpp-topbar {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .lpp-back-btn {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+  }
+  .lpp-topbar-jumps {
+    display: none;
+  }
+  .lpp-topbar-level span:last-child {
+    display: none; /* show only emoji on mobile */
+  }
+}
+
+/* ── Very small phones: up to 360px ──────────────────────────────── */
+@media (max-width: 360px) {
+  .lpp-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 8px;
+  }
+  .lpp-card {
+    padding: 12px 8px 8px;
+    border-radius: 14px;
+  }
+  .lpp-card-tag {
+    display: none; /* too cramped at this width */
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   UNIVERSAL CARD LOCKING MECHANICS
+══════════════════════════════════════════════════════ */
+
+/* The parent card must have relative positioning and hidden overflow 
+   so the overlay doesn't spill out of the rounded corners. */
+.locked-card {
+  position: relative !important;
+  overflow: hidden !important;
+  cursor: pointer;
+  /* NO filter here, so our child badges stay colorful! */
+}
+
+/* Hard locked items (levels too far ahead) */
+.hard-locked {
+  cursor: not-allowed;
+}
+
+/* The Frosted Glass Overlay */
+.lock-overlay {
+  position: absolute;
+  inset: 0;
+  /* A sleek, dark blue-black semi-transparent background */
+  background: rgba(20, 26, 45, 0.8) !important; 
+  /* Blurs and grays out the colorful card underneath! */
+  backdrop-filter: blur(4px) grayscale(80%); 
+  -webkit-backdrop-filter: blur(4px) grayscale(80%);
+  border-radius: inherit; /* Copies the rounded corners of the parent card */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.3s ease;
+}
+
+/* Lighten the overlay slightly when they hover so it feels interactive */
+.locked-card:hover .lock-overlay {
+  background: rgba(20, 26, 45, 0.7) !important;
+}
+
+.hard-locked .lock-overlay {
+  background: rgba(10, 10, 10, 0.9) !important;
+  backdrop-filter: blur(6px) grayscale(100%);
+}
+
+/* Inner Overlay Elements */
+.lock-icon { 
+  font-size: 2.8rem; 
+  margin-bottom: 8px; 
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+}
+
+.lock-text {
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 8px 14px;
+  margin: 0 12px;
+  line-height: 1.4;
+  /* Translucent white bubble for readability */
+  background: rgba(255, 255, 255, 0.15); 
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  color: #ffffff;
+  font-family: var(--font-body, 'Nunito', sans-serif);
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.lock-text b {
+  color: #FFD700; /* Gold emphasis for keywords */
+  font-weight: 800;
+}
+
+/* The "OR Pay" Badge */
+.play-cost-badge {
+  background: linear-gradient(135deg, #fff8e1, #ffe082);
+  color: #b45309;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-family: var(--font-display, 'Baloo 2', cursive);
+  font-weight: 800;
+  margin-top: 12px;
+  border: 2px solid #ffc107;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

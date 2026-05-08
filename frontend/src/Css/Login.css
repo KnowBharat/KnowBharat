@@ -1,0 +1,316 @@
+/* Login.css */
+
+/* ── Page wrapper ─────────────────────────────────────────────────────────── */
+.login-page {
+  /* Cotton Candy Background */
+  background: linear-gradient(90deg, #ffdee9 0%, #b5fffc 100%);
+  user-select: none;
+  
+  /* Removes bottom strip and fills screen */
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Nunito', sans-serif;
+  overflow: hidden;
+}
+
+/* Light overlay blobs to add depth */
+.login-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(255,153,51,0.08)  0%, transparent 40%);
+  pointer-events: none;
+}
+
+/* ── Floating Glass Squircles ─────────────────────────────────────────────── */
+.lp-shape {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 28px; 
+  animation: float-spin 15s linear infinite;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+.lp-shape:nth-child(1) { width: 140px; height: 140px; top: 8%; left: 8%; animation-duration: 18s; }
+.lp-shape:nth-child(2) { width: 85px; height: 85px; top: 15%; right: 12%; animation-duration: 14s; animation-direction: reverse; }
+.lp-shape:nth-child(3) { width: 180px; height: 180px; bottom: -5%; left: 12%; animation-duration: 22s; }
+.lp-shape:nth-child(4) { width: 100px; height: 100px; bottom: 15%; right: 8%; animation-duration: 16s; animation-direction: reverse; }
+.lp-shape:nth-child(5) { width: 60px; height: 60px; top: 40%; left: 35%; animation-duration: 12s; }
+
+@keyframes float-spin {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-30px) rotate(180deg); }
+  100% { transform: translateY(0) rotate(360deg); }
+}
+
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+.login-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 32px;
+  padding: 48px 44px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow:
+    0 10px 44px rgba(0, 0, 0, 0.1),
+    0 0 0 1.5px rgba(0, 78, 137, 0.1);
+  position: relative;
+  z-index: 10;
+  animation: lp-card-in 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes lp-card-in {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0)      scale(1);    }
+}
+
+/* ── Parent badge ─────────────────────────────────────────────────────────── */
+.lp-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #e8f4fd, #cce7f8);
+  border: 1.5px solid rgba(0, 78, 137, 0.2);
+  border-radius: 30px;
+  padding: 8px 22px;
+  width: fit-content;
+  margin: 0 auto 20px;
+  font-family: 'Baloo 2', cursive;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #004E89;
+  letter-spacing: 0.3px;
+}
+
+/* ── Header Group (Logo & Title Side-by-Side) ─────────────────────────────── */
+.lp-header-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.lp-logo-img {
+  height: 65px;
+  width: 65px;      
+  object-fit: contain;
+  display: block;
+}
+
+.lp-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #004E89, #0077CC, #FF9933);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.lp-subtitle {
+  text-align: center;
+  color: #999;
+  font-size: 0.88rem;
+  margin-bottom: 20px;
+}
+
+/* ── Tricolor bar ─────────────────────────────────────────────────────────── */
+.tricolor-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #FF9933 33.33%, #ffffff 33.33%, #ffffff 66.66%, #138808 66.66%);
+  border-radius: 2px;
+  margin-bottom: 28px;
+}
+
+/* ── Error alert ──────────────────────────────────────────────────────────── */
+.lp-error {
+  background: #fff0f0;
+  border: 1.5px solid #ffcccc;
+  color: #cc0000;
+  border-radius: 12px;
+  padding: 11px 15px;
+  font-size: 0.86rem;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 600;
+  animation: lp-card-in 0.3s ease both;
+}
+
+/* ── Form groups ──────────────────────────────────────────────────────────── */
+.lp-form-group {
+  margin-bottom: 18px;
+  position: relative;
+}
+.lp-form-group label {
+  display: block;
+  font-weight: 700;
+  color: #3a3a3a;
+  margin-bottom: 6px;
+  font-size: 0.87rem;
+  letter-spacing: 0.2px;
+}
+.lp-input {
+  width: 100%;
+  padding: 13px 44px 13px 16px;
+  border: 2px solid #e8e8e8;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-family: 'Nunito', sans-serif;
+  background: #fdfcfc;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  box-sizing: border-box;
+  outline: none;
+  color: #333;
+}
+.lp-input:focus {
+  border-color: #004E89;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(0, 78, 137, 0.11);
+}
+
+/* Show/hide password toggle */
+.lp-input-toggle {
+  position: absolute;
+  right: 15px;
+  top: 34px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 6px;           /* ← increase from 2px — makes touch target bigger */
+  min-width: 44px;        /* ← WCAG minimum touch target */
+  min-height: 44px;       /* ← WCAG minimum touch target */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bbb;
+  transition: color 0.2s;
+  line-height: 1;
+}
+.lp-input-toggle:hover { color: #004E89; }
+
+/* ── Forgot password ──────────────────────────────────────────────────────── */
+.lp-forgot {
+  text-align: right;
+  margin-top: -10px;
+  margin-bottom: 22px;
+}
+.lp-forgot a {
+  font-size: 0.82rem;
+  color: #004E89;
+  text-decoration: none;
+  font-weight: 600;
+}
+.lp-forgot a:hover { text-decoration: underline; }
+
+/* ── Submit button ────────────────────────────────────────────────────────── */
+.lp-submit-btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: white;
+  cursor: pointer;
+  background: linear-gradient(135deg, #004E89, #0077CC);
+  box-shadow: 0 6px 22px rgba(0, 78, 137, 0.28);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.4px;
+}
+.lp-submit-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(255, 255, 255, 0.12), transparent);
+}
+.lp-submit-btn:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 28px rgba(0, 78, 137, 0.35);
+}
+.lp-submit-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+.lp-submit-btn:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Spinner */
+.lp-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: lp-spin-fast 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+@keyframes lp-spin-fast { to { transform: rotate(360deg); } }
+
+/* ── Divider ──────────────────────────────────────────────────────────────── */
+.lp-divider {
+  text-align: center;
+  margin: 22px 0;
+  color: #ccc;
+  font-size: 0.8rem;
+  position: relative;
+}
+.lp-divider::before,
+.lp-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #ebebeb;
+}
+.lp-divider::before { left: 0; }
+.lp-divider::after  { right: 0; }
+
+/* ── Register redirect ────────────────────────────────────────────────────── */
+.lp-register-link {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #777;
+}
+.lp-register-link a {
+  color: #004E89;
+  font-weight: 700;
+  text-decoration: none;
+}
+.lp-register-link a:hover { text-decoration: underline; }
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .login-card { padding: 36px 24px 28px; }
+  .lp-title   { font-size: 1.7rem; }
+  .lp-logo-img { height: 50px; } /* Shrink slightly more for phones */
+}

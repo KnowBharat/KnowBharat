@@ -707,5 +707,40 @@ INSERT INTO festivals (id, state_id, name, description, image_url) VALUES
 (98, 36, 'Rath Yatra', 'A famous chariot festival celebrated in ISKCON temples across West Bengal, particularly in Kolkata.', '../Image/WestBengal/RathYatra.jpg');
 
 
+CREATE TABLE national_symbols (
+    id VARCHAR(50) PRIMARY KEY,
+    emoji VARCHAR(50) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    since VARCHAR(50) NOT NULL,
+    color VARCHAR(20) NOT NULL,
+    bg VARCHAR(100) NOT NULL,
+    accent VARCHAR(20) NOT NULL,
+    fact TEXT NOT NULL,
+    tags VARCHAR(100) NOT NULL,
+    image_url VARCHAR(255) NOT NULL,
+    specialBg BOOLEAN DEFAULT FALSE
+);
+
+INSERT INTO national_symbols (id, emoji, category, title, name, since, color, bg, accent, fact, tags, image_url, specialBg) VALUES
+('bird', '🦚', 'Wildlife', 'National Bird', 'Peacock', '1963', '#00b4d8', 'linear-gradient(135deg,#e0f7ff,#b3ecff)', '#005f80', 'The peacock''s dazzling tail feathers, called a "train," can be up to 6 feet long and feature iridescent "eye" patterns.', 'Protected,Migratory', '../Image/Symbols/Peacock.jpeg', FALSE),
+('animal', '🐯', 'Wildlife', 'National Animal', 'Bengal Tiger', '1973', '#FF9933', 'linear-gradient(135deg,#fff3e0,#ffe0b2)', '#7a4000', 'India is home to over 70% of the world''s wild tiger population. Project Tiger was launched the same year it became the national animal.', 'Endangered,Project Tiger', '../Image/Symbols/Tiger.jpg', FALSE),
+('flower', '🪷', 'Flora', 'National Flower', 'Lotus', 'Ancient', '#ff006e', 'linear-gradient(135deg,#ffe0ef,#ffb3d1)', '#7a0033', 'The lotus blooms in muddy water yet remains unstained — a symbol of purity, enlightenment, and self-regeneration in Indian culture.', 'Sacred,Aquatic', '../Image/Symbols/Lotus.jpeg', FALSE),
+('tree', '🌳', 'Flora', 'National Tree', 'Indian Banyan', 'Traditional', '#138808', 'linear-gradient(135deg,#e8fded,#c6f6d5)', '#1a5c2a', 'A single Banyan tree can spread over several acres through its aerial prop roots. The Great Banyan in Kolkata is over 250 years old.', 'Sacred,Evergreen', '../Image/Symbols/Banyan.jpeg', FALSE),
+('fruit', '🥭', 'Flora', 'National Fruit', 'Mango', 'Traditional', '#ffbe0b', 'linear-gradient(135deg,#fff8e0,#ffe680)', '#5a4000', 'India is the world''s largest mango producer with over 1,000 varieties. Mangoes have been cultivated here for more than 5,000 years.', 'Tropical,5000+ Years', '../Image/Symbols/Mango.jpg', FALSE),
+('river', '🏞️', 'Geography', 'National River', 'Ganga (Ganges)', '2008', '#00b4d8', 'linear-gradient(135deg,#e0f7ff,#c8f0ff)', '#003a52', 'The Ganga is 2,525 km long and considered sacred by over 400 million people. It supports the world''s most densely populated river basin.', 'Sacred,2525 km', '/..Image/Symbols/Ganga.jpeg', FALSE),
+('sport', '🏑', 'Culture', 'National Sport', 'Field Hockey', 'Traditional', '#3a86ff', 'linear-gradient(135deg,#e0eaff,#b3ccff)', '#003080', 'India dominated Olympic hockey from 1928–1956, winning 6 consecutive gold medals. Legends like Dhyan Chand made it the golden era of Indian hockey.', 'Olympic Gold ×8,Legacy', '../Image/Symbols/Hockey.jpeg', FALSE),
+('emblem', '🏛️', 'State', 'National Emblem', 'Lion Capital of Ashoka', '1950', '#8338ec', 'linear-gradient(135deg,#f0e8ff,#d9b3ff)', '#4a0080', 'Adopted on 26 Jan 1950, it features four Asiatic lions on an abacus with the motto "Satyameva Jayate" (Truth alone triumphs) from the Mundaka Upanishad.', 'Republic Day,Ashoka Pillar', '../Image/Symbols/Emblem.jpg', FALSE),
+('currency', '₹', 'State', 'National Currency', 'Indian Rupee', '2010', '#06d6a0', 'linear-gradient(135deg,#e0fff7,#b3ffea)', '#005a40', 'The ₹ symbol was designed by D. Udaya Kumar in 2010. It blends the Devanagari "र" with the Latin "R", reflecting India''s bilingual identity.', 'Symbol 2010,Devanagari', '../Image/Symbols/Rupee.jpg', FALSE),
+('anthem', '🎵', 'Culture', 'National Anthem', 'Jana Gana Mana', '1950', '#fb5607', 'linear-gradient(135deg,#ffe8e0,#ffbfaa)', '#7a2000', 'Written by Rabindranath Tagore in 1911, it takes exactly 52 seconds to sing. It was adopted as the national anthem on 24 January 1950.', 'Tagore,52 Seconds', '../Image/Symbols/Anthem.jpg', FALSE),
+('song', '🎶', 'Culture', 'National Song', 'Vande Mataram', '1950', '#d62828', 'linear-gradient(135deg,#ffe0e0,#ffb3b3)', '#7a0000', 'Composed by Bankim Chandra Chatterjee in 1882, it became the inspiration for Indian independence movement. The first two stanzas hold equal status with the anthem.', '1882,Independence', '../Image/Symbols/Song.webp', FALSE),
+('aquatic', '🐬', 'Wildlife', 'National Aquatic Animal', 'Ganges River Dolphin', '2009', '#4361ee', 'linear-gradient(135deg,#e8ecff,#c5ccff)', '#1a237e', 'Nearly blind, this dolphin navigates entirely by echolocation. It is a symbol of the purity and health of the Ganga river ecosystem.', 'Endangered,Echolocation', '../Image/Symbols/Dolphin.jpeg', FALSE),
+('reptile', '🐍', 'Wildlife', 'National Reptile', 'King Cobra', 'Traditional', '#4a4e69', 'linear-gradient(135deg,#ecedf5,#d0d2e8)', '#22223b', 'The King Cobra is the world''s longest venomous snake, reaching up to 5.5 metres. Uniquely, it builds nests to guard its eggs.', '5.5m Longest,Nests Eggs', '../Image/Symbols/Cobra.jpeg', FALSE),
+('heritage', '🐘', 'Wildlife', 'National Heritage Animal', 'Indian Elephant', '2010', '#7f5af0', 'linear-gradient(135deg,#ede7ff,#d0baff)', '#3b0086', 'India has the largest Asian elephant population in the world. Elephants have played a central role in Indian culture, religion, and warfare for millennia.', 'Largest Pop.,Sacred', '../Image/Symbols/Elephant.jpeg', FALSE),
+('calendar', '📅', 'State', 'National Calendar', 'Saka Calendar', '1957', '#e07a5f', 'linear-gradient(135deg,#fde8e0,#f8c8b8)', '#7a2800', 'Adopted on 22 March 1957, the Saka era began in 78 CE. The calendar has 12 months, with Chaitra as the first month, used in official government communications.', '78 CE Origin,Official', '../Image/Symbols/Calendar.webp', FALSE),
+('flag', 'Flag.png', 'State', 'National Flag', 'Tiranga', '1947', '#FF9933', 'linear-gradient(135deg,#fff9f0,#fff3e0)', '#5a3000', 'The tricolour features saffron (courage), white (peace & truth), and green (faith & chivalry). The navy blue Ashoka Chakra at centre has 24 spokes.', '24 Spokes,Tiranga', '../Image/Symbols/flag_real.jpg', TRUE);
+
+
 
 

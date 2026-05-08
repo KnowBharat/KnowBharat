@@ -2,6 +2,7 @@ package com.knowbharat.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.io.Serializable;
 
 @Entity
 @Data
@@ -9,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "states")
-public class State {
+public class State implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

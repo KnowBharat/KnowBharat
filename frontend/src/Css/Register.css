@@ -1,0 +1,401 @@
+/* Register.css — Lighthouse-optimised */
+
+/*
+  ✅ FIX 7 (CLS / TBT): font-display: swap on Google Fonts is set via the URL param
+     in index.html (see note at bottom). Here we declare the fallback metrics so the
+     layout shift from font swap is minimised (font metric overrides).
+
+  Add to your <head> in index.html:
+    REPLACE:
+      <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    WITH:
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+      <noscript><link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@400;700&display=swap" rel="stylesheet"></noscript>
+
+  Also add to <head> for LCP image preload:
+      <link rel="preload" as="image" href="/KnowBharat.webp" type="image/webp" fetchpriority="high">
+
+  ✅ FIX 8 (CLS): Font metric overrides keep layout stable during font swap
+*/
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: local('Baloo 2');
+  /* Fallback metrics matching Baloo 2 to reduce CLS from font swap */
+  ascent-override: 96%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: local('Nunito');
+  ascent-override: 100%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+}
+
+/* ── Page wrapper ─────────────────────────────────────────────────────────── */
+.register-page {
+  background: linear-gradient(90deg, #ffdee9 0%, #b5fffc 100%);
+  user-select: none;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Nunito', sans-serif;
+  overflow: hidden;
+}
+
+.register-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(255,153,51,0.08)  0%, transparent 40%);
+  pointer-events: none;
+}
+
+/* ── Floating Glass Squircles ─────────────────────────────────────────────── */
+.reg-shape {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 28px;
+  /*
+    ✅ FIX 9 (CLS / Perf): Use will-change: transform to promote to GPU layer.
+    ✅ FIX 10 (CLS): Use transform-only animations — these are compositor-only
+       and do NOT trigger layout reflow. Avoid animating top/left/width/height.
+  */
+  will-change: transform;
+  animation: float-spin 15s linear infinite;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  /* ✅ FIX 11: contain: strict isolates layout/paint to prevent reflow cascade */
+  contain: strict;
+}
+
+.reg-shape:nth-child(1) { width: 140px; height: 140px; top: 8%;   left: 8%;   animation-duration: 18s; }
+.reg-shape:nth-child(2) { width: 85px;  height: 85px;  top: 15%;  right: 12%; animation-duration: 14s; animation-direction: reverse; }
+.reg-shape:nth-child(3) { width: 180px; height: 180px; bottom: -5%; left: 12%; animation-duration: 22s; }
+.reg-shape:nth-child(4) { width: 100px; height: 100px; bottom: 15%; right: 8%; animation-duration: 16s; animation-direction: reverse; }
+.reg-shape:nth-child(5) { width: 60px;  height: 60px;  top: 40%;  left: 35%; animation-duration: 12s; }
+
+/*
+  ✅ FIX 12 (Non-composited animation): Original used translateY + rotate together,
+  which forces a compositor layer but is fine. The key fix is adding will-change above
+  and making sure we ONLY animate transform (not top/left which cause reflow).
+*/
+@keyframes float-spin {
+  0%   { transform: translateY(0)     rotate(0deg);   }
+  50%  { transform: translateY(-30px) rotate(180deg); }
+  100% { transform: translateY(0)     rotate(360deg); }
+}
+
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+.register-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 32px;
+  padding: 44px 44px 36px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow:
+    0 16px 56px rgba(0, 0, 0, 0.1),
+    0 0 0 1.5px rgba(0, 78, 137, 0.1);
+  position: relative;
+  z-index: 10;
+  animation: reg-card-in 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  /* ✅ contain layout so card changes don't trigger full-page reflow */
+  contain: layout;
+}
+
+@keyframes reg-card-in {
+  from { opacity: 0; transform: translateY(48px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0)      scale(1);   }
+}
+
+/* ── Header Group ─────────────────────────────────────────────────────────── */
+.reg-header-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.reg-logo-img {
+  /*
+    ✅ FIX 13 (CLS): width + height in CSS mirrors the HTML attributes — belt AND braces.
+    The browser reserves exactly this space before the image loads, so no shift occurs.
+  */
+  width: 65px;
+  height: 65px;
+  display: block;
+  /* ✅ object-fit ensures the image won't distort if source is not exactly 65×65 */
+  object-fit: contain;
+}
+
+.reg-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #004E89, #0077CC, #FF9933);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.reg-subtitle {
+  text-align: center;
+  color: #999;
+  font-size: 0.88rem;
+  margin-bottom: 20px;
+}
+
+/* ── Tricolor accent bar ──────────────────────────────────────────────────── */
+.tricolor-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #FF9933 33.33%, #ffffff 33.33%, #ffffff 66.66%, #138808 66.66%);
+  border-radius: 2px;
+  margin-bottom: 24px;
+}
+
+/* ── Alerts ───────────────────────────────────────────────────────────────── */
+.reg-error,
+.reg-success {
+  border-radius: 12px;
+  padding: 11px 15px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 600;
+  animation: reg-card-in 0.3s ease both;
+}
+.reg-error   { background: #fff0f0; border: 1.5px solid #ffcccc; color: #cc0000; }
+.reg-success { background: #f0fff4; border: 1.5px solid #99ddaa; color: #1a7a3a; justify-content: center; }
+
+/* ── Form layout ──────────────────────────────────────────────────────────── */
+.reg-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.reg-form-group {
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.reg-form-group label {
+  display: block;
+  font-weight: 700;
+  color: #3a3a3a;
+  margin-bottom: 6px;
+  font-size: 0.84rem;
+  letter-spacing: 0.2px;
+}
+
+/* ── Inputs ───────────────────────────────────────────────────────────────── */
+.reg-input {
+  width: 100%;
+  padding: 12px 44px 12px 14px;
+  border: 2px solid #e8e8e8;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-family: 'Nunito', sans-serif;
+  background: #fdfcfc;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  box-sizing: border-box;
+  outline: none;
+  color: #333;
+}
+.reg-input:focus {
+  border-color: #004E89;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(0, 78, 137, 0.11);
+}
+
+/* ── Password toggle ──────────────────────────────────────────────────────── */
+.reg-input-toggle {
+  position: absolute;
+  right: 12px;
+  /*
+    ✅ FIX 14 (A11y / Touch targets): Minimum 44×44px touch target (WCAG 2.5.5).
+    Previously the button was ~24px. We keep the icon small but pad the hit area.
+  */
+  top: 50%;
+  /* Offset to sit below the label (label is ~20px + 6px margin = ~26px) */
+  margin-top: 13px;
+  transform: translateY(-50%);
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0;
+  color: #bbb;
+  transition: color 0.2s;
+  line-height: 1;
+  border-radius: 8px;
+}
+.reg-input-toggle:hover  { color: #004E89; }
+.reg-input-toggle:focus-visible {
+  outline: 2px solid #004E89;
+  outline-offset: 2px;
+}
+
+/* ── Submit button ────────────────────────────────────────────────────────── */
+.reg-submit-btn {
+  width: 100%;
+  /* ✅ FIX 15 (Touch targets): min-height 44px for WCAG compliance */
+  min-height: 44px;
+  padding: 15px;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: white;
+  cursor: pointer;
+  background: linear-gradient(135deg, #004E89, #0077CC);
+  box-shadow: 0 6px 22px rgba(0, 78, 137, 0.28);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.3px;
+  margin-top: 10px;
+}
+.reg-submit-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(255, 255, 255, 0.12), transparent);
+  pointer-events: none;
+}
+.reg-submit-btn:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 28px rgba(0, 78, 137, 0.35);
+}
+.reg-submit-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+.reg-submit-btn:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+  transform: none;
+}
+.reg-submit-btn:focus-visible {
+  outline: 3px solid #FF9933;
+  outline-offset: 3px;
+}
+
+/* ── Back button ──────────────────────────────────────────────────────────── */
+.reg-back-btn {
+  /* ✅ FIX 16 (Touch targets + A11y): Proper button styling with 44px touch target */
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  background: none;
+  border: none;
+  color: #004E89;
+  margin-top: 15px;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  transition: background 0.2s;
+  padding: 8px;
+}
+.reg-back-btn:hover { background: rgba(0, 78, 137, 0.07); }
+.reg-back-btn:focus-visible {
+  outline: 2px solid #004E89;
+  outline-offset: 2px;
+}
+
+/* ── Spinner ──────────────────────────────────────────────────────────────── */
+.reg-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: reg-spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+  will-change: transform;
+}
+@keyframes reg-spin { to { transform: rotate(360deg); } }
+
+/* ── Login redirect ───────────────────────────────────────────────────────── */
+.reg-login-link {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #777;
+}
+.reg-login-link a {
+  color: #004E89;
+  font-weight: 700;
+  text-decoration: none;
+  /* ✅ Touch target: make the link easier to tap */
+  padding: 4px 2px;
+  border-radius: 4px;
+}
+.reg-login-link a:hover { text-decoration: underline; }
+.reg-login-link a:focus-visible {
+  outline: 2px solid #004E89;
+  outline-offset: 2px;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .register-card  { padding: 32px 24px; }
+  .reg-form-row   { grid-template-columns: 1fr; gap: 0; }
+  .reg-title      { font-size: 1.7rem; }
+  .reg-logo-img   { width: 50px; height: 50px; }
+}
+
+/*
+  ✅ FIX 17 (Accessibility): Respect user motion preference.
+  Users who set "reduce motion" in their OS won't see the spinning / floating shapes.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .reg-shape,
+  .register-card,
+  .reg-error,
+  .reg-success,
+  .reg-spinner {
+    animation: none;
+  }
+  .reg-submit-btn {
+    transition: none;
+  }
+}

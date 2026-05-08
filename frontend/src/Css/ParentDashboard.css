@@ -1,0 +1,461 @@
+@font-face { font-family: 'Baloo 2'; font-display: swap; }
+@font-face { font-family: 'Nunito';  font-display: swap; }
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.pd-root {
+  min-height: 100vh;
+  font-family: 'Nunito', sans-serif;
+  color: #2d3748;
+  background: #f4f7fa;
+}
+
+/* ── Sidebar ── */
+.pd-sidebar {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: 260px;
+  background: linear-gradient(180deg, #1a2340 0%, #004E89 100%);
+  padding: 32px 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.18);
+  transition: all 0.3s ease;
+}
+
+.pd-brand {
+  text-align: center;
+  padding: 0 24px 32px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 24px;
+}
+
+.pd-brand-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.pd-brand-logo img {
+  width: 75px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+  transition: transform 0.3s ease;
+}
+
+.pd-brand-logo img:hover {
+  transform: translateY(-3px) scale(1.05);
+}
+
+.pd-brand-name {
+  font-family: 'Baloo 2', cursive;
+  color: white;
+  font-size: 1.6rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #FF9933, #FFD700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.pd-brand-sub {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.85rem;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+.pd-nav {
+  flex: 1;
+  padding: 0 12px;
+}
+
+.pd-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  color: rgba(255,255,255,0.65);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-icon { font-size: 1.2rem; }
+
+.pd-nav-item:hover {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.pd-nav-item.active {
+  background: linear-gradient(90deg, rgba(255,153,51,0.3), rgba(255,153,51,0.1));
+  color: #FFD700;
+  border-left: 4px solid #FF9933;
+}
+
+/* ── Sidebar Actions ── */
+.sidebar-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 12px;
+}
+
+.pd-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(255,80,80,0.15);
+  color: #ff9999;
+  border: none;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.pd-logout:hover {
+  background: rgba(255,80,80,0.3);
+  color: #ffdddd;
+  transform: translateY(-2px);
+}
+
+/* ── Main Layout ── */
+.pd-main {
+  margin-left: 260px;
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+.pd-topbar {
+  background: white;
+  padding: 20px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e8edf3;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.pd-topbar-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a2340;
+}
+
+.pd-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pd-parent-name {
+  font-weight: 700;
+  color: #444;
+  font-size: 1rem;
+}
+
+.pd-avatar {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF9933, #FF6B35);
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 800;
+  box-shadow: 0 3px 10px rgba(255,107,53,0.3);
+}
+
+.pd-content {
+  padding: 32px 36px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ── Grids ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.pd-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+/* ── Stat Cards ── */
+.stat-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  border-top: 4px solid;
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: cardFadeIn 0.5s ease both;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.stat-icon  { font-size: 2rem; margin-bottom: 8px; }
+.stat-value { font-family: 'Baloo 2', cursive; font-size: 2.5rem; font-weight: 800; color: #1a2340; line-height: 1; }
+.stat-label { font-size: 0.9rem; color: #555; font-weight: 700; margin-top: 6px; } /* ✅ #888→#555 contrast fix */
+
+/* ── Content Cards ── */
+.pd-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  overflow: hidden;
+  animation: cardFadeIn 0.5s ease 0.2s both;
+  display: flex;
+  flex-direction: column;
+}
+
+.pd-card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafbfc;
+}
+
+.pd-card-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #1a2340;
+}
+
+.pd-card-body {
+  padding: 24px;
+  flex: 1;
+}
+
+/* ── Bar Charts ── */
+.chart-container { display: flex; flex-direction: column; gap: 15px; }
+
+.chart-row { width: 100%; }
+
+.chart-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #444;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.chart-label span {
+  color: #555; /* ✅ was #888 — contrast fix */
+  font-weight: 600;
+}
+
+.chart-bar-bg {
+  width: 100%; height: 12px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.chart-bar-fill {
+  width: 100%; /* set to final width immediately */
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.8s ease;
+  will-change: transform;
+}
+
+/* ── Skeleton shimmer ── */
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+.skeleton-bar {
+  background: #f0f0f0;
+  overflow: hidden;
+  position: relative;
+}
+
+.skeleton-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, #e8e8e8 50%, transparent 100%);
+  animation: shimmer 1.5s infinite;
+  will-change: transform;
+}
+/* ── Forms ── */
+.pd-form { display: flex; flex-direction: column; gap: 16px; }
+
+.pd-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #555;
+  gap: 6px;
+}
+
+.pd-input {
+  padding: 12px 16px;
+  border: 2px solid #e8e8e8;
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  transition: all 0.2s;
+  background: #fdfcfc;
+}
+
+.pd-input:focus {
+  border-color: #004E89;
+  background: white;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,78,137,0.1);
+}
+
+.pd-btn {
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.pd-btn.primary { background: linear-gradient(135deg, #004E89, #0077CC); }
+.pd-btn.primary:hover { box-shadow: 0 6px 16px rgba(0,78,137,0.3); transform: translateY(-2px); }
+
+.pd-btn.danger { background: linear-gradient(135deg, #e53935, #ff5252); }
+.pd-btn.danger:hover { box-shadow: 0 6px 16px rgba(229,57,53,0.3); transform: translateY(-2px); }
+
+/* ── Activity List ── */
+.activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.activity-item:last-child { border-bottom: none; }
+
+.activity-name { font-weight: 700; font-size: 0.95rem; color: #333; }
+
+.activity-time {
+  font-size: 0.8rem;
+  color: #555; /* ✅ was #aaa — contrast fix */
+  margin-top: 2px;
+}
+
+/* ParentDashboard.css */
+.activity-score {
+  font-family: 'Baloo 2', cursive;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+  text-align: center;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4); /* strengthen this */
+}
+
+/* ── Animations ── */
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .pd-sidebar { width: 85px; padding: 20px 0; }
+  .pd-brand-name, .pd-brand-sub, .nav-text { display: none; }
+  .pd-nav-item { justify-content: center; padding: 16px; border-radius: 12px; }
+  .pd-nav-item.active { border-left: none; background: rgba(255,153,51,0.2); }
+  .nav-icon { font-size: 1.5rem; margin: 0; }
+  .sidebar-actions { padding: 0 8px; }
+  .pd-logout { padding: 14px; justify-content: center; }
+  .pd-main { margin-left: 85px; }
+  .pd-content { padding: 24px 20px; }
+}
+
+@media (max-width: 768px) {
+  .pd-sidebar {
+    top: auto; bottom: 0;
+    width: 100%; height: 75px;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    z-index: 1000;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+  }
+  .pd-brand { display: none; }
+  .pd-nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+    padding: 0 5px;
+  }
+  .pd-nav-item {
+    flex-direction: column;
+    padding: 8px 0;
+    border-radius: 0;
+    margin: 0;
+    border: none;
+    border-top: 3px solid transparent;
+  }
+  .pd-nav-item.active {
+    border-left: none;
+    border-top: 3px solid #FF9933;
+    background: rgba(255,153,51,0.1);
+  }
+  .nav-icon { font-size: 1.4rem; }
+  .sidebar-actions { flex-direction: row; padding: 0 10px 0 0; gap: 5px; margin-top: 0; }
+  .pd-logout { padding: 10px; border-radius: 10px; }
+  .pd-main { margin-left: 0; padding-bottom: 80px; }
+  .pd-topbar { padding: 15px 20px; }
+  .pd-content { padding: 20px; }
+  .pd-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .pd-parent-name { display: none; }
+  .pd-topbar-title { font-size: 1.25rem; }
+  .pd-content { padding: 15px; }
+  .stat-value { font-size: 2rem; }
+  .activity-score { font-size: 0.85rem; padding: 4px 10px; }
+}

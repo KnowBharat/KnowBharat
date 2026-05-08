@@ -30,9 +30,9 @@ const IndiaMap = ({ onHover, onClick, hoveredState, selectedState, ...props }) =
       <defs>
         <style>
           {
-            `.state { fill: #4CAF50; stroke: #fff; stroke-width: 0.5; cursor: pointer; transition: fill 0.2s;}
-            .state.hovered { stroke: #FF9800; stroke-width: 3;}
-            .state.selected { fill: #FF9800;}; height: 120%; width: 120%; }`
+            `.state { fill: #1bc2ff; stroke: #000000; stroke-width: 0.5; cursor: pointer; transition: fill 0.2s;}
+            .state.hovered { stroke: #0b0b0b; stroke-width: 3;}
+            .state.selected { fill: #4400ff;}; height: 120%; width: 120%; }`
           }
         </style>
       </defs>
