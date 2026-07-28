@@ -11,14 +11,12 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/progress")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/api/auth/progress")
 public class UserProgressController {
 
     private final UserProgressRepository progressRepository;
     private final UserRepository userRepository;
 
-    // 🌟 REMOVED MapExplorationRepository from constructor!
     public UserProgressController(UserProgressRepository progressRepository,
                                   UserRepository userRepository) {
         this.progressRepository = progressRepository;
@@ -29,8 +27,15 @@ public class UserProgressController {
         return progressRepository.findById(userId).orElseGet(() -> {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found"));
+
             UserProgress newProgress = new UserProgress();
+
+            newProgress.setUserId(userId);
             newProgress.setUser(user);
+
+            newProgress.setCoins(100);
+            newProgress.setKeysCount(5);
+
             return progressRepository.save(newProgress);
         });
     }
@@ -90,7 +95,6 @@ public class UserProgressController {
             progressRepository.save(progress);
 
         } else if ("map_explored_nodes".equals(request.getKey())) {
-            // 🌟 UPDATED: Save map nodes directly to the JSON list!
             List<String> currentNodes = progress.getExploredMapNodes();
             for (Object nodeObj : rawData) {
                 String node = nodeObj.toString();

@@ -5,6 +5,10 @@ import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals
 import '../Css/MatchingGame.css';
 import { apiFetch } from '../Hooks/useApi';
 import { useEconomy } from '../Hooks/EconomyContext'; 
+import { API_BASE_URL } from '../Hooks/config';
+import useGameModal from '../Hooks/useGameModal';
+
+const BASE = `${API_BASE_URL}`;
 
 const LEVELS = [
   { id: 'symbols', num: 1, emoji: '🦚', title: 'National Symbols', desc: 'Match national symbols to their names!', tag: 'Starter', color: '#00b4d8', bg: 'linear-gradient(135deg,#e0f7ff,#b3ecff)', border: '#00b4d8', tagColor: '#005f80' },
@@ -21,12 +25,17 @@ const LEVELS = [
 export default function MatchingIndex() {
   const userId = localStorage.getItem("userId");
   const [activeLevel, setActiveLevel] = useState(null);
-  const [confirmAction, setConfirmAction] = useState(null); // 🌟 Unified Confirmation State
-  const [customAlert, setCustomAlert] = useState(null); 
-  
-  const { coins, setCoins, keys, setKeys, showStore, setShowStore, unlockedLevels, setGameUnlock } = useEconomy();
-  
-  // matchingUnlocked format: 1.1, 1.2, 1.3... just like puzzle!
+  const { 
+    coins, setCoins, keys, setKeys, 
+    unlockedLevels, setGameUnlock, gameScores, updateScoreData 
+  } = useEconomy();
+  const { 
+    showStore, setShowStore, confirmAction, setConfirmAction, customAlert, setCustomAlert, 
+    claimDaily, watchAdCoins, watchAdKeys, 
+    buyCoinPack1, buyCoinPack2, buyCoinPack3,
+    buyKeyPack1, buyKeyPack2, buyKeyPack3,
+    buyCombo1, buyCombo2
+  } = useGameModal();  // matchingUnlocked format: 1.1, 1.2, 1.3... just like puzzle!
   const matchingUnlocked = unlockedLevels.matching || 1.1;
   const setMatchingUnlocked = (val) => setGameUnlock('matching', val);
 
@@ -79,7 +88,7 @@ export default function MatchingIndex() {
       
       // Update Database
       try {
-        await fetch(`http://localhost:8081/api/progress/currency/${userId}`, {
+        await fetch(`${BASE}/api/auth/progress/currency/${userId}`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coins: coins, keysCount: newKeys })
         });
       } catch (err) { console.error("Failed to save currency", err); }
@@ -91,20 +100,6 @@ export default function MatchingIndex() {
       setShowStore(true);
     }
   };
-
-  // 🌟 FULLY INTEGRATED ASYNC STORE FUNCTIONS
-  const updateCurrencyDB = async (c, k) => {
-    try {
-      await fetch(`http://localhost:8081/api/progress/currency/${userId}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coins: c, keysCount: k })
-      });
-    } catch (err) { console.error("Failed to save currency", err); }
-  };
-
-  const watchAd = async () => { const c = coins+50, k = keys+1; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '📺', title: 'Reward Claimed!', text: '+50 Coins and +1 Key.' }); await updateCurrencyDB(c, k); };
-  const buyTokens = async () => { const c = coins+500, k = keys+10; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '💳', title: 'Purchase Successful!', text: '+500 Coins and +10 Keys.' }); await updateCurrencyDB(c, k); };
-  const claimDaily = async () => { const c = coins+100, k = keys+3; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '🎁', title: 'Daily Reward Claimed!', text: '+100 Coins and +3 Keys.' }); await updateCurrencyDB(c, k); };
-  const buyMegaPack = async () => { const c = coins+2000, k = keys+50; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '💎', title: 'Mega Pack Purchased!', text: '+2000 Coins and +50 Keys.' }); await updateCurrencyDB(c, k); };
 
   return (
     <>
@@ -133,8 +128,23 @@ export default function MatchingIndex() {
         onCancel={() => setConfirmAction(null)} 
       />
 
-      <StoreModal show={showStore} onClose={() => setShowStore(false)} onWatchAd={watchAd} onBuyTokens={buyTokens} onDailyReward={claimDaily} onBuyMegaPack={buyMegaPack} />
-      <CustomAlertModal alert={customAlert} onClose={() => setCustomAlert(null)} />
+      <StoreModal
+        show={showStore}
+        onClose={() => setShowStore(false)}
+        isParent={true} 
+        onDailyReward={claimDaily}
+        onWatchAdCoins={watchAdCoins}
+        onWatchAdKeys={watchAdKeys}
+        onBuyCoin1={buyCoinPack1}
+        onBuyCoin2={buyCoinPack2}
+        onBuyCoin3={buyCoinPack3}
+        onBuyKey1={buyKeyPack1}
+        onBuyKey2={buyKeyPack2}
+        onBuyKey3={buyKeyPack3}
+        onBuyCombo1={buyCombo1}
+        onBuyCombo2={buyCombo2}
+      />
+<CustomAlertModal alert={customAlert} onClose={() => setCustomAlert(null)} />
     </>
   );
 }

@@ -3,11 +3,13 @@ package com.knowbharat.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Entity(name = "festivals")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Festival {
+public class Festival implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

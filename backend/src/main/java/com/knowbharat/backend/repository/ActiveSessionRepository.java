@@ -1,4 +1,3 @@
-// repository/ActiveSessionRepository.java
 package com.knowbharat.backend.repository;
 
 import com.knowbharat.backend.entity.ActiveSession;

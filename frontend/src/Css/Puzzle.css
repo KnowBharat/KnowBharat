@@ -288,8 +288,8 @@
 ══════════════════════════════════════════════════════ */
 .pz-preview-overlay {
   position: absolute;
-  top: 35%; left: 40%;
-  transform: translate(-40%, -40%);
+  top: 25%; left: 45%;
+  /* transform: translate(-40%, -40%); */
   background: rgba(255,255,255,0.97);
   border: 2.5px solid #ffb74d;
   border-radius: 22px;
@@ -329,6 +329,7 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.12);
   animation: gc-in 0.4s cubic-bezier(.34,1.56,.64,1) both;
   box-sizing: border-box;
+  margin-top: 2%;
 }
 .pz-inter-emoji, .pz-done-emoji { font-size: clamp(2rem, 6vw, 3rem); animation: gc-bounce 1.5s ease-in-out infinite; }
 .pz-inter-title, .pz-done-title { font-family: var(--font-display); font-size: clamp(1.2rem, 4vw, 1.5rem); font-weight: 800; margin: 0; text-align: center; }

@@ -13,12 +13,9 @@ public class DashboardStatsResponse {
     private Integer mapExploredCount;
     private List<ActivityDto> recentActivities;
     private List<String> recentlyExploredStates;
-    private String parentName;
     private String childName;
     private String email;
-    private List<LeaderboardEntry> globalLeaderboard;
-
-    // DELETED: moduleScores, moduleTimes, and mapScores Maps!
+    private List<LeaderboardEntry> leaderboard; // The list lives HERE, not inside the entry
 
     @Data
     @NoArgsConstructor

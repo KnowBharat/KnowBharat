@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserProgressRepository extends JpaRepository<UserProgress, Long> {
-    // Changed String to Long here --------^
 }

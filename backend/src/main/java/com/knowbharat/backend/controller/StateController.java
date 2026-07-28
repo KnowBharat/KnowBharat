@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/states")
-@CrossOrigin(origins = "http://localhost:3000")
 public class StateController {
     @Autowired
     private StateService stateService;

@@ -1,88 +1,97 @@
 import React, { useEffect, useState } from 'react';
 import { trackStateVisit, apiFetch } from '../Hooks/useApi';
-import useFoodData from '../Hooks/useFoodData';
-import usePlaceData from '../Hooks/usePlaceData';
-import useFestivalData from '../Hooks/useFestivalData';
-import useWearData from '../Hooks/useWearData';
-import { useEconomy } from '../Hooks/EconomyContext'; 
-import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals'; // 🌟 Added ConfirmActionModal
+import useCategoryData from '../Hooks/useCategoryData';
+import { useEconomy } from '../Hooks/EconomyContext';
+import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals';
+import { API_BASE_URL } from '../Hooks/config';
+import useGameModal from '../Hooks/useGameModal';
+const BASE = `${API_BASE_URL}/api/auth`;
 
 export default function MapLevel({ levelMeta, stateInfo, onLevelComplete }) {
   const id = stateInfo?.id || 0;
   const userId = localStorage.getItem("userId");
 
-  const foodData = useFoodData(id);
-  const placeData = usePlaceData(id);
-  const festivalData = useFestivalData(id);
-  const wearData = useWearData(id);
+  const foodData = useCategoryData('foods', id);
+  const placeData = useCategoryData('places', id);
+  const festivalData = useCategoryData('festivals', id);
+  const wearData = useCategoryData('wears', id);
 
   const [learnIdx, setLearnIdx] = useState(0);
   const [learnTab, setLearnTab] = useState('basic');
-  const [customAlert, setCustomAlert] = useState(null);
-  const [confirmAction, setConfirmAction] = useState(null); // 🌟 NEW: State for Confirmation Modal
-
-  const { 
-    coins, setCoins, keys, setKeys, showStore, setShowStore, 
-    gameScores, updateScoreData, 
-    unlockedLevels, setGameUnlock 
+  const {
+    coins, setCoins, keys, setKeys,
+    unlockedLevels, setGameUnlock, gameScores, updateScoreData
   } = useEconomy();
-
+  const { 
+    showStore, setShowStore, confirmAction, setConfirmAction, customAlert, setCustomAlert, 
+    claimDaily, watchAdCoins, watchAdKeys, 
+    buyCoinPack1, buyCoinPack2, buyCoinPack3,
+    buyKeyPack1, buyKeyPack2, buyKeyPack3,
+    buyCombo1, buyCombo2
+  } = useGameModal();
   // 🌟 TIERED PRICING LOGIC
   const getLevelCost = (num) => {
-    if (num === 1) return 0;                     // Free
-    if (num >= 2 && num <= 4) return 7;          // 7 Coins
-    if (num >= 5 && num <= 8) return 11;         // 11 Coins
-    if (num >= 9 && num <= 11) return 13;        // 13 Coins
+    if (num === 1) return 0;
+    if (num >= 2 && num <= 4) return 7;
+    if (num >= 5 && num <= 8) return 11;
+    if (num >= 9 && num <= 11) return 13;
     return 0;
   };
 
   const cost = getLevelCost(levelMeta.num);
-  
-  // 🌟 PERFECT SYNC: Format matches MapIndex.jsx (e.g., "WB lvl 2")
-  const unlockKey = `${stateInfo.id} lvl ${levelMeta.num}`; 
+
+  const unlockKey = `${stateInfo.id} lvl ${levelMeta.num}`;
   const unlockedNodes = Array.isArray(gameScores['map_explored_nodes']) ? gameScores['map_explored_nodes'] : [];
-  
-  // Level 1 is always free, otherwise check if it's in the JSON array
+
   const isUnlocked = levelMeta.num === 1 || unlockedNodes.includes(unlockKey);
-
   useEffect(() => {
-    if (stateInfo?.name) trackStateVisit(stateInfo.name);
-    setLearnIdx(0); 
-    setLearnTab('basic'); 
+    // if (stateInfo?.name) trackStateVisit(stateInfo.name);
+    setLearnIdx(0);
+    setLearnTab('basic');
 
-    // 🌟 Check for Level Progression (10 states) based on DB data
-    if (isUnlocked && stateInfo?.id && levelMeta?.num) {
+    const isAlreadySaved = unlockedNodes.includes(unlockKey);
+
+    if (levelMeta?.num === 1 && !isAlreadySaved) {
+      const newNodes = [...unlockedNodes, unlockKey];
+      updateScoreData('map_explored_nodes', newNodes);
+
+      fetch(`${BASE}/progress/data/${userId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'map_explored_nodes', value: newNodes }) // Saves "14 lvl 1" as a string
+      }).catch(err => console.error(err));
+    }
+
+    // 🌟 Check for Level Progression (10 states)
+    if ((isUnlocked || levelMeta?.num === 1) && stateInfo?.id && levelMeta?.num) {
       const currentLevelExplored = unlockedNodes.filter(node => node.endsWith(` lvl ${levelMeta.num}`));
-      
-      // Auto-Unlock the next map level if they hit 10 states!
+
       if (currentLevelExplored.length >= 10 && levelMeta.num === (unlockedLevels.map || 1)) {
         setGameUnlock('map', levelMeta.num + 1);
-        
-        // Trigger the SweetAlert modal in MapIndex!
         if (onLevelComplete) {
-          setTimeout(onLevelComplete, 400); 
+          setTimeout(onLevelComplete, 400);
         }
       }
     }
-  }, [stateInfo?.id, stateInfo?.name, levelMeta?.num, isUnlocked, unlockedNodes.length]); 
+  }, [stateInfo?.id, stateInfo?.name, levelMeta?.num, unlockKey, unlockedNodes, isUnlocked, unlockedLevels.map]);
 
   if (!stateInfo || !levelMeta) return null;
 
   // 🌟 PRE-ACTION CHECK: Prompt user before spending coins
   const promptUnlock = () => {
     if (coins < cost) {
-      setCustomAlert({ 
-        type: 'warning', 
-        icon: '🪙', 
-        title: 'Out of Coins!', 
-        text: `You need ${cost} Coins for Level ${levelMeta.num}. \nVisit the Store to get more.` 
+      setCustomAlert({
+        type: 'warning',
+        icon: '🪙',
+        title: 'Out of Coins!',
+        text: `You need ${cost} Coins for Level ${levelMeta.num}. \nVisit the Store to get more.`
       });
       setShowStore(true);
       return;
     }
 
     if (cost === 0) {
-      executeUnlock(0); // If it's free, unlock directly without asking
+      executeUnlock(0);
     } else {
       setConfirmAction({
         cost: cost,
@@ -97,77 +106,57 @@ export default function MapLevel({ levelMeta, stateInfo, onLevelComplete }) {
   // 🌟 ASYNC UNLOCK: Deducts coins, saves to UI, and saves to DB instantly!
   const executeUnlock = async (freeCost) => {
     const finalCost = freeCost !== undefined ? freeCost : confirmAction.cost;
-    setConfirmAction(null); // Close Modal
+    setConfirmAction(null);
 
-    // 2. Prepare the new data
     const newCoins = coins - finalCost;
     const newNodes = [...unlockedNodes, unlockKey];
 
-    // 3. Optimistic Update (Update UI immediately)
     setCoins(newCoins);
     updateScoreData('map_explored_nodes', newNodes);
 
-    // 4. Save to Backend
     try {
       if (finalCost > 0) {
-        await fetch(`http://localhost:8081/api/progress/currency/${userId}`, {
+        await fetch(`${BASE}/progress/currency/${userId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ coins: newCoins, keysCount: keys })
         });
       }
 
-      // Save the new State Unlock to the JSON list
-      await fetch(`http://localhost:8081/api/progress/data/${userId}`, {
+      await fetch(`${BASE}/progress/data/${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: 'map_explored_nodes', value: newNodes })
       });
 
-      // Track activity for Dashboard
-      apiFetch('/dashboard/activity', { 
-        method: 'POST', 
-        body: JSON.stringify({ 
-          game: 'map', 
-          score: null, 
-          stateName: `Unlocked ${stateInfo.name} (Lvl ${levelMeta.num})` 
-        }) 
+      apiFetch('/dashboard/activity', {
+        method: 'POST',
+        body: JSON.stringify({
+          game: 'map',
+          score: null,
+          stateName: `Unlocked ${stateInfo.name} (Lvl ${levelMeta.num})`
+        })
       });
 
       if (finalCost > 0) {
-        setCustomAlert({ 
-          type: 'success', 
-          icon: '🔓', 
-          title: 'State Unlocked!', 
-          text: `Success! ${finalCost} Coins deducted.` 
+        setCustomAlert({
+          type: 'success',
+          icon: '🔓',
+          title: 'State Unlocked!',
+          text: `Success! ${finalCost} Coins deducted.`
         });
       }
-
     } catch (err) {
       console.error("Failed to sync unlock to database", err);
     }
   };
-
-  // 🌟 ASYNC STORE FUNCTIONS: Saves purchases instantly to the DB
-  const updateCurrencyDB = async (c, k) => {
-    try {
-      await fetch(`http://localhost:8081/api/progress/currency/${userId}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coins: c, keysCount: k })
-      });
-    } catch (err) { console.error("Failed to save currency", err); }
-  };
-
-  const watchAd = async () => { const c = coins+50, k = keys+1; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '📺', title: 'Reward Claimed!', text: '+50 Coins and +1 Key.' }); await updateCurrencyDB(c, k); };
-  const buyTokens = async () => { const c = coins+500, k = keys+10; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '💳', title: 'Purchase Successful!', text: '+500 Coins and +10 Keys.' }); await updateCurrencyDB(c, k); };
-  const claimDaily = async () => { const c = coins+100, k = keys+3; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '🎁', title: 'Daily Reward Claimed!', text: '+100 Coins and +3 Keys.' }); await updateCurrencyDB(c, k); };
-  const buyMegaPack = async () => { const c = coins+2000, k = keys+50; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '💎', title: 'Mega Pack Purchased!', text: '+2000 Coins and +50 Keys.' }); await updateCurrencyDB(c, k); };
 
   const capital = stateInfo.capital || stateInfo.aboutCapital || '—';
 
   const renderCarousel = (dataArray, title, colorHex, bgClass) => {
     const item = dataArray?.[learnIdx];
     if (!dataArray?.length) return <div style={{ textAlign: 'center', color: '#bbb', padding: '30px' }}>No data available.</div>;
-    
+
     return (
       <div className={`learn-card ${bgClass}`} style={{ border: `1.5px solid ${colorHex}55` }}>
         <div className="learn-title" style={{ color: colorHex }}>{title}</div>
@@ -195,12 +184,12 @@ export default function MapLevel({ levelMeta, stateInfo, onLevelComplete }) {
         <div style={{ fontSize: '3.5rem', marginBottom: '10px' }}>🔒</div>
         <h3 style={{ color: '#b45309', marginBottom: '10px', fontFamily: "'Baloo 2', cursive", fontSize: '1.5rem' }}>Level Locked</h3>
         <p style={{ color: '#777', fontSize: '1rem', marginBottom: '20px' }}>Pay coins to discover new facts about {stateInfo.name}!</p>
-        <button 
-           onClick={promptUnlock}
-           style={{ background: '#FF9933', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '14px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 0 #cc7a00', transition: 'transform 0.1s' }}
-           onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
-           onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
-           onMouseDown={(e) => e.target.style.transform = 'scale(0.95)'}
+        <button
+          onClick={promptUnlock}
+          style={{ background: '#FF9933', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '14px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 0 #cc7a00', transition: 'transform 0.1s' }}
+          onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
+          onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+          onMouseDown={(e) => e.target.style.transform = 'scale(0.95)'}
         >
           Unlock 🪙 {cost}
         </button>
@@ -386,20 +375,27 @@ export default function MapLevel({ levelMeta, stateInfo, onLevelComplete }) {
       )}
       <div className="lt-content">{content}</div>
 
-      {/* 🌟 SHARED CONFIRMATION MODAL */}
-      <ConfirmActionModal 
-        confirmAction={confirmAction} 
-        onConfirm={() => executeUnlock()} 
-        onCancel={() => setConfirmAction(null)} 
+      <ConfirmActionModal
+        confirmAction={confirmAction}
+        onConfirm={() => executeUnlock()}
+        onCancel={() => setConfirmAction(null)}
       />
 
-      <StoreModal 
-        show={showStore} 
-        onClose={() => setShowStore(false)} 
-        onWatchAd={watchAd} 
-        onBuyTokens={buyTokens} 
+      <StoreModal
+        show={showStore}
+        onClose={() => setShowStore(false)}
+        isParent={true} 
         onDailyReward={claimDaily}
-        onBuyMegaPack={buyMegaPack}
+        onWatchAdCoins={watchAdCoins}
+        onWatchAdKeys={watchAdKeys}
+        onBuyCoin1={buyCoinPack1}
+        onBuyCoin2={buyCoinPack2}
+        onBuyCoin3={buyCoinPack3}
+        onBuyKey1={buyKeyPack1}
+        onBuyKey2={buyKeyPack2}
+        onBuyKey3={buyKeyPack3}
+        onBuyCombo1={buyCombo1}
+        onBuyCombo2={buyCombo2}
       />
       <CustomAlertModal alert={customAlert} onClose={() => setCustomAlert(null)} />
     </div>

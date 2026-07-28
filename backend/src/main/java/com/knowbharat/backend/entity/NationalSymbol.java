@@ -8,12 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data // Generates getters, setters, toString, equals, and hashcode
-@NoArgsConstructor // Generates a no-args constructor
-@AllArgsConstructor // Generates a constructor with all fields
+import java.io.Serializable;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "national_symbols")
-public class NationalSymbol {
+public class NationalSymbol implements Serializable {
 
     @Id
     private String id;

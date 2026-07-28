@@ -194,8 +194,8 @@
 .learn-carousel-name { font-family: var(--font-display); font-size: clamp(0.95rem, 2.5vw, 1.1rem); font-weight: 800; color: #c1121f; margin: 0 0 4px; text-align: center; }
 .learn-carousel-desc { font-size: clamp(0.75rem, 2vw, 0.83rem); color: #555; text-align: center; line-height: 1.5; margin: 0 0 12px; }
 .learn-carousel-nav  { display: flex; justify-content: space-between; align-items: center; }
-.learn-nav-btn { background: var(--saffron); color: white; border: none; padding: 7px 16px; border-radius: 12px; font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: background 0.2s; }
-.learn-nav-btn:hover { background: #e07000; }
+.learn-nav-btn { background: var(--saffron); color: #e07000; border: none; padding: 7px 16px; border-radius: 12px; font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: background 0.2s; }
+.learn-nav-btn:hover { background: #e07000; color: white; }
 .learn-counter { font-size: 0.78rem; color: #999; font-weight: 600; }
 
 .ml-tab {

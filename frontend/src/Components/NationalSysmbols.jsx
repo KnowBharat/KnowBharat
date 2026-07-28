@@ -4,7 +4,10 @@ import '../Css/NationalSymbols.css';
 import { apiFetch } from '../Hooks/useApi';
 import { useEconomy } from '../Hooks/EconomyContext';
 import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals'; // 🌟 Added ConfirmActionModal
+import { API_BASE_URL } from '../Hooks/config';
+import useGameModal from '../Hooks/useGameModal';
 
+const BASE = `${API_BASE_URL}/api`;
 const CATEGORIES = ['All', 'Wildlife', 'Flora', 'Culture', 'State', 'Geography'];
 const DEFAULT_UNLOCKED = ['1', '2', '3'];
 
@@ -18,24 +21,24 @@ export default function NationalSymbols() {
   const [loading, setLoading] = useState(true);
 
   const [selectedImageModal, setSelectedImageModal] = useState(null);
-  const [customAlert, setCustomAlert] = useState(null);
-  const [confirmAction, setConfirmAction] = useState(null); // 🌟 Unified Confirmation State
-
-  const {
-    unlockedLevels, setGameUnlock,
-    coins, setCoins,
-    keys, setKeys,
-    showStore, setShowStore,
-    gameScores, updateScoreData
+  const { 
+    coins, setCoins, keys, setKeys, 
+    unlockedLevels, setGameUnlock, gameScores, updateScoreData 
   } = useEconomy();
-
+  const { 
+    showStore, setShowStore, confirmAction, setConfirmAction, customAlert, setCustomAlert, 
+    claimDaily, watchAdCoins, watchAdKeys, 
+    buyCoinPack1, buyCoinPack2, buyCoinPack3,
+    buyKeyPack1, buyKeyPack2, buyKeyPack3,
+    buyCombo1, buyCombo2
+  } = useGameModal();
   const unlockedSymbols = gameScores['unlocked_symbols_list'] || [];
   const setUnlockedSymbols = (val) => updateScoreData('unlocked_symbols_list', val);
   const progressCount = new Set([...DEFAULT_UNLOCKED, ...unlockedSymbols]).size;
 
   useEffect(() => {
     // 1. Fetch Symbol Data
-    fetch('http://localhost:8081/api/symbols')
+    fetch(`${BASE}/symbols`)
       .then(res => res.ok ? res.json() : [])
       .then(data => {
         if (!Array.isArray(data)) { setSymbolsData([]); setLoading(false); return; }
@@ -50,15 +53,16 @@ export default function NationalSymbols() {
 
     // 2. Fetch Unlocked Symbols
     if (userId) {
-      fetch(`http://localhost:8081/api/progress/symbols/${userId}`)
-        .then(res => res.ok ? res.json() : [])
-        .then(savedSymbols => {
-          if (savedSymbols && Array.isArray(savedSymbols) && savedSymbols.length > 0) {
-            setUnlockedSymbols(savedSymbols); 
-          }
-        })
-        .catch(err => console.error("Could not fetch saved symbols:", err));
-    }
+  // 🌟 FIX: Added '/auth' to the path so it matches the secured controller
+  fetch(`${BASE}/auth/progress/symbols/${userId}`) 
+    .then(res => res.ok ? res.json() : [])
+    .then(savedSymbols => {
+      if (savedSymbols && Array.isArray(savedSymbols) && savedSymbols.length > 0) {
+        setUnlockedSymbols(savedSymbols); 
+      }
+    })
+    .catch(err => console.error("Could not fetch saved symbols:", err));
+}
   }, [userId]);
 
   const filtered = activeCategory === 'All'
@@ -99,11 +103,11 @@ export default function NationalSymbols() {
       setUnlockedSymbols(newUnlocked);
       
       try {
-        await fetch(`http://localhost:8081/api/progress/currency/${userId}`, {
+        await fetch(`${BASE}/auth/progress/currency/${userId}`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coins: newCoins, keysCount: keys })
         });
 
-        await fetch(`http://localhost:8081/api/progress/data/${userId}`, {
+        await fetch(`${BASE}/auth/progress/data/${userId}`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'unlocked_symbols_list', value: newUnlocked })
         });
 
@@ -131,20 +135,6 @@ export default function NationalSymbols() {
       navigate('/map');
     }
   };
-
-  // 🌟 ASYNC STORE FUNCTIONS (Saves to DB)
-  const updateCurrencyDB = async (c, k) => {
-    try {
-      await fetch(`http://localhost:8081/api/progress/currency/${userId}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coins: c, keysCount: k })
-      });
-    } catch (err) { console.error("Failed to save currency", err); }
-  };
-
-  const watchAd = async () => { const c = coins+50, k = keys+1; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '📺', title: 'Reward Claimed!', text: '+50 Coins and +1 Key.' }); await updateCurrencyDB(c, k); };
-  const buyTokens = async () => { const c = coins+500, k = keys+10; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '💳', title: 'Purchase Successful!', text: '+500 Coins and +10 Keys.' }); await updateCurrencyDB(c, k); };
-  const claimDaily = async () => { const c = coins+100, k = keys+3; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '🎁', title: 'Daily Reward Claimed!', text: '+100 Coins and +3 Keys.' }); await updateCurrencyDB(c, k); };
-  const buyMegaPack = async () => { const c = coins+2000, k = keys+50; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '💎', title: 'Mega Pack Purchased!', text: '+2000 Coins and +50 Keys.' }); await updateCurrencyDB(c, k); };
 
   const toggleFact = (e, id) => { e.stopPropagation(); setExpanded(expanded === id ? null : id); };
   const openImageModal = (sym) => setSelectedImageModal(sym);
@@ -180,9 +170,10 @@ export default function NationalSymbols() {
 
       <div className="ns-grid">
         {filtered.map((sym, i) => {
-          const isUnlocked = DEFAULT_UNLOCKED.includes(sym.id) || unlockedSymbols.includes(sym.id);
-          const isOpen = expanded === sym.id;
-
+  const symbolIdStr = String(sym.id);
+  const isUnlocked = DEFAULT_UNLOCKED.includes(symbolIdStr) || 
+                     unlockedSymbols.map(String).includes(symbolIdStr);
+const isOpen = expanded === sym.id;
           return (
             <div
               key={sym.id}
@@ -266,13 +257,21 @@ export default function NationalSymbols() {
         onCancel={() => setConfirmAction(null)} 
       />
 
-      <StoreModal 
-        show={showStore} 
-        onClose={() => setShowStore(false)} 
-        onWatchAd={watchAd} 
-        onBuyTokens={buyTokens} 
-        onDailyReward={claimDaily} 
-        onBuyMegaPack={buyMegaPack} 
+      <StoreModal
+        show={showStore}
+        onClose={() => setShowStore(false)}
+        isParent={true} 
+        onDailyReward={claimDaily}
+        onWatchAdCoins={watchAdCoins}
+        onWatchAdKeys={watchAdKeys}
+        onBuyCoin1={buyCoinPack1}
+        onBuyCoin2={buyCoinPack2}
+        onBuyCoin3={buyCoinPack3}
+        onBuyKey1={buyKeyPack1}
+        onBuyKey2={buyKeyPack2}
+        onBuyKey3={buyKeyPack3}
+        onBuyCombo1={buyCombo1}
+        onBuyCombo2={buyCombo2}
       />
       
       <CustomAlertModal alert={customAlert} onClose={() => setCustomAlert(null)} />

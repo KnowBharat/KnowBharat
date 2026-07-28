@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import useStateData from '../Hooks/useStateData';
-import useFoodData from '../Hooks/useFoodData';
-import usePlaceData from '../Hooks/usePlaceData';
-import useFestivalData from '../Hooks/useFestivalData';
-import useWearData from '../Hooks/useWearData';
+import useCategoryData from '../Hooks/useCategoryData';
 import WinningAnimation from './WinningAnimation';
 import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals'; 
 import '../Css/Quiz.css';
 import { trackScore } from '../Hooks/useApi';
 import { useEconomy } from '../Hooks/EconomyContext'; 
+import { API_BASE_URL } from '../Hooks/config';
+import useGameModal from '../Hooks/useGameModal';
 
+const BASE = `${API_BASE_URL}/api`;
 const PICTURE_CATS = new Set(['symbols', 'food', 'festival', 'wear', 'place']);
 const QS_PER_ROUND = 5; 
 const MIN_CORRECT_TO_PASS = 3; // 🌟 Passing requirement
@@ -127,22 +127,31 @@ function buildImageQ(item, pools, n) {
 
 export default function QuizGame({ category, onBack, onLevelComplete }) {
   const { stateData } = useStateData();
-  const foodData = useFoodData(null, true) || [];
-  const placeData = usePlaceData(null, true) || [];
-  const festivalData = useFestivalData(null, true) || [];
-  const wearData = useWearData(null, true) || [];
+  const foodData     = useCategoryData('foods', null, true) || [];
+const placeData    = useCategoryData('places', null, true) || [];
+const festivalData = useCategoryData('festivals', null, true) || [];
+const wearData     = useCategoryData('wears', null, true) || [];
 
   const userId = localStorage.getItem("userId");
   const levelNum = LEVEL_NUMS[category] || 1;
+const { 
+    showStore, setShowStore, confirmAction, setConfirmAction, customAlert, setCustomAlert, 
+    claimDaily, watchAdCoins, watchAdKeys, 
+    buyCoinPack1, buyCoinPack2, buyCoinPack3,
+    buyKeyPack1, buyKeyPack2, buyKeyPack3,
+    buyCombo1, buyCombo2
+  } = useGameModal();
+  const { 
 
-  const { coins, setCoins, keys, setKeys, showStore, setShowStore, gameScores, updateScoreData, unlockedLevels, setGameUnlock } = useEconomy();
-  
-  const [customAlert, setCustomAlert] = useState(null); 
-  const [confirmAction, setConfirmAction] = useState(null); 
+    coins, setCoins, keys, setKeys, 
+
+    unlockedLevels, setGameUnlock, gameScores, updateScoreData 
+
+  } = useEconomy();
 
   const [symbolsData, setSymbolsData] = useState([]);
   useEffect(() => {
-    fetch('http://localhost:8081/api/symbols').then(res => res.ok ? res.json() : []).then(data => { if (Array.isArray(data)) setSymbolsData(data); }).catch(console.error);
+    fetch(`${BASE}/symbols`).then(res => res.ok ? res.json() : []).then(data => { if (Array.isArray(data)) setSymbolsData(data); }).catch(console.error);
   }, []);
 
   const scoreKey = `quiz_${category}_scores`;
@@ -295,7 +304,7 @@ export default function QuizGame({ category, onBack, onLevelComplete }) {
           const newCoins = coins - cost;
           setCoins(newCoins);
           try {
-            await fetch(`http://localhost:8081/api/progress/currency/${userId}`, {
+            await fetch(`${BASE}/auth/progress/currency/${userId}`, {
               method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coins: newCoins, keysCount: keys })
             });
           } catch(err) { console.error(err); }
@@ -310,7 +319,7 @@ export default function QuizGame({ category, onBack, onLevelComplete }) {
         setGameUnlock('quiz', nextValStr / 10); 
 
         try {
-          await fetch(`http://localhost:8081/api/progress/currency/${userId}`, {
+          await fetch(`${BASE}/auth/progress/currency/${userId}`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coins: coins, keysCount: newKeys })
           });
         } catch(err) { console.error(err); }
@@ -365,17 +374,7 @@ export default function QuizGame({ category, onBack, onLevelComplete }) {
     }
   };
 
-  const updateCurrencyDB = async (c, k) => {
-    try {
-      await fetch(`http://localhost:8081/api/progress/currency/${userId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coins: c, keysCount: k }) });
-    } catch (err) { console.error(err); }
-  };
-
-  const watchAd = async () => { const c = coins+50, k = keys+1; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '📺', title: 'Reward Claimed!', text: '+50 Coins and +1 Key.' }); await updateCurrencyDB(c, k); };
-  const buyTokens = async () => { const c = coins+500, k = keys+10; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '💳', title: 'Purchase Successful!', text: '+500 Coins and +10 Keys.' }); await updateCurrencyDB(c, k); };
-  const claimDaily = async () => { const c = coins+100, k = keys+3; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '🎁', title: 'Daily Reward Claimed!', text: '+100 Coins and +3 Keys.' }); await updateCurrencyDB(c, k); };
-  const buyMegaPack = async () => { const c = coins+2000, k = keys+50; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '💎', title: 'Mega Pack Purchased!', text: '+2000 Coins and +50 Keys.' }); await updateCurrencyDB(c, k); };
-
+  
   if (phase === 'loading' || !roundsData) return <div className="qz-loading"><div className="qz-spinner" /><p className="qz-loading-text">Building questions…</p></div>;
 
   const roundPlayCost = getRoundCoinCost(category, levelNum, roundIdx);
@@ -385,7 +384,7 @@ export default function QuizGame({ category, onBack, onLevelComplete }) {
         <>
             <div style={{maxWidth: '500px', margin: '40px auto', textAlign: 'center', background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)'}}>
                 <h2 style={{fontFamily: "'Baloo 2', cursive", fontSize: '2rem', color: '#1a2340', marginBottom: '10px'}}>Quiz Rounds</h2>
-                <p style={{color: '#666', marginBottom: '20px'}}>Pass with at least <strong>3/5 correct</strong> to advance!</p>
+                {/* <p style={{color: '#666', marginBottom: '20px'}}>Pass with at least <strong>3/5 correct</strong> to advance!</p> */}
                 <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
                     {ROUNDS.map((r, i) => {
                         const isUnlocked = isRoundUnlocked(i);
@@ -425,8 +424,23 @@ export default function QuizGame({ category, onBack, onLevelComplete }) {
             />
 
             <CustomAlertModal alert={customAlert} onClose={() => setCustomAlert(null)} />
-            <StoreModal show={showStore} onClose={() => setShowStore(false)} onWatchAd={watchAd} onBuyTokens={buyTokens} onDailyReward={claimDaily} onBuyMegaPack={buyMegaPack} />
-        </>
+            <StoreModal
+        show={showStore}
+        onClose={() => setShowStore(false)}
+        isParent={true} 
+        onDailyReward={claimDaily}
+        onWatchAdCoins={watchAdCoins}
+        onWatchAdKeys={watchAdKeys}
+        onBuyCoin1={buyCoinPack1}
+        onBuyCoin2={buyCoinPack2}
+        onBuyCoin3={buyCoinPack3}
+        onBuyKey1={buyKeyPack1}
+        onBuyKey2={buyKeyPack2}
+        onBuyKey3={buyKeyPack3}
+        onBuyCombo1={buyCombo1}
+        onBuyCombo2={buyCombo2}
+      />
+ </>
     );
   }
 
@@ -500,7 +514,6 @@ export default function QuizGame({ category, onBack, onLevelComplete }) {
           <button onClick={() => setPhase('round-select')} style={{background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.5rem', marginRight: '10px'}}>🔙</button>
           <span className="qz-round-chip" style={{ background: roundMeta.color }}>{roundMeta.emoji} {roundMeta.label}</span>
         </div>
-        <div className="qz-progress-track"><div className="qz-progress-fill" style={{ width: `${(doneQ / totalQ) * 100}%`, background: `linear-gradient(to right, ${ROUNDS[0].color}, ${roundMeta.color})` }} /></div>
         <div className="qz-sub-row"><span className="qz-counter">Q{qIdx + 1}/{QS_PER_ROUND} · {roundMeta.n} options</span><span className="qz-score-pill">🎯 {score}</span></div>
         <h3 className="qz-question">{current.questionText}</h3>
         {isImageQ && current.imageUrl && (<div className="qz-image-wrap"><img src={current.imageUrl} alt="quiz" className="qz-image" /></div>)}

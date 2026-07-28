@@ -1,6 +1,8 @@
 // hooks/useRegister.js
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from './config';
+const BASE = `${API_BASE_URL}/api/auth`;
 
 // ── Password strength calculator ─────────────────────────────────────────────
 export function getStrength(pw) {
@@ -82,7 +84,7 @@ export default function useRegister() {
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8081/api/auth/register', {
+      const res = await fetch(`${BASE}/register`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -98,7 +98,7 @@ export default function Login() {
         {/* 🌟 Flex container for Logo and Title side-by-side */}
         <div className="lp-header-group">
           <img
-            src="/KnowBharat.png"
+            src="/KnowBharat.webp"
             alt="KnowBharat Logo"
             className="lp-logo-img"
             width="65"

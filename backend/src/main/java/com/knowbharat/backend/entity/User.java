@@ -1,10 +1,14 @@
 package com.knowbharat.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
 public class User {
     @Id
@@ -12,9 +16,11 @@ public class User {
     private Long id;
 
     @Column(nullable = false)
-    private String firstName;
+    private String childName;
 
-    private String lastName;
+    private String schoolName;
+    private String dob;
+    private String phone;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -23,5 +29,4 @@ public class User {
     private String password;
 
     private String role;
-    private String childName;
 }

@@ -41,7 +41,7 @@ public class UserProgress {
     @Column(columnDefinition = "TEXT")
     private List<String> unlockedSymbols = new ArrayList<>();
 
-    // 🌟 NEW JSON Column for Map Explored Nodes!
+    // JSON Column for Map Explored Nodes!
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = "TEXT")
     private List<String> exploredMapNodes = new ArrayList<>();

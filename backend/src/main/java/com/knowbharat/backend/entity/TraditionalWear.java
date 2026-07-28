@@ -3,11 +3,13 @@ package com.knowbharat.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Entity (name = "traditional_wears")
-@Data // Generates getters, setters, toString, equals, and hashcode
-@NoArgsConstructor // Generates a no-args constructor
-@AllArgsConstructor // Generates a constructor with all fields
-public class TraditionalWear {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TraditionalWear implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

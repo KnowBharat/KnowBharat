@@ -3,7 +3,8 @@ import lombok.Data;
 
 @Data
 public class EditProfileRequest {
-    private String firstName;
-    private String lastName;
     private String childName;
+    private String schoolName;
+    private String dob;
+    private String phone;
 }

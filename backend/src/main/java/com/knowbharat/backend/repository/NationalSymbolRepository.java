@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NationalSymbolRepository extends JpaRepository<NationalSymbol, String> {
-    // JpaRepository gives us findAll() built-in!
 }

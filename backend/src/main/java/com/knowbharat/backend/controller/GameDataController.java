@@ -1,5 +1,6 @@
 package com.knowbharat.backend.controller;
 
+import com.knowbharat.backend.dto.GameScoreDto;
 import com.knowbharat.backend.entity.*;
 import com.knowbharat.backend.repository.*;
 import com.knowbharat.backend.service.DataCleanupService;
@@ -10,9 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-@CrossOrigin(origins = "*")
+
 @RestController
-@RequestMapping("/api/game-data")
+@RequestMapping("/api/auth/game-data")
 public class GameDataController {
 
     @Autowired private GameActivityRepository activityRepo;
@@ -41,19 +42,25 @@ public class GameDataController {
     }
 
     // ─── 2. OVERALL FETCHING (WITH TIME FILTERS) ───
-
     @GetMapping("/score/overall/{userId}")
     public ResponseEntity<?> getScores(@PathVariable Long userId, @RequestParam(defaultValue = "all") String filter) {
+        // 1. Get the cutoff time based on the filter string ("daily", "weekly", etc.)
         LocalDateTime cutoff = getCutoffTime(filter);
+
+        // 2. Fetch scores based on whether a cutoff exists
+        List<GameScore> scores;
         if (cutoff == null) {
-            // All-time total logic
-            return ResponseEntity.ok(Map.of("totalScore", scoreRepo.getTotalScoreByUserId(userId)));
+            // "all" time - fetch everything
+            scores = scoreRepo.findByUserId(userId);
         } else {
-            // Daily, Weekly, Monthly logic
-            List<GameScore> recentScores = scoreRepo.findByUserIdAndTimestampAfter(userId, cutoff);
-            int total = recentScores.stream().mapToInt(GameScore::getScore).sum();
-            return ResponseEntity.ok(Map.of("totalScore", total, "scores", recentScores));
+            // Fetch only records newer than the cutoff date
+            scores = scoreRepo.findByUserIdAndTimestampAfter(userId, cutoff);
         }
+
+        // 3. Calculate total
+        int total = scores.stream().mapToInt(GameScore::getScore).sum();
+
+        return ResponseEntity.ok(Map.of("totalScore", total, "scores", scores));
     }
 
     @GetMapping("/activity/overall/{userId}")
@@ -76,11 +83,14 @@ public class GameDataController {
 
     // ─── UTILITY METHOD ───
     private LocalDateTime getCutoffTime(String filter) {
+        LocalDateTime now = LocalDateTime.now();
         return switch (filter.toLowerCase()) {
-            case "daily" -> LocalDateTime.now().minusDays(1);
-            case "weekly" -> LocalDateTime.now().minusWeeks(1);
-            case "monthly" -> LocalDateTime.now().minusMonths(1);
-            default -> null; // 'all' time
+            case "daily" -> now.withHour(0).withMinute(0).withSecond(0).withNano(0);
+            case "weekly" -> now.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
+                    .withHour(0).withMinute(0).withSecond(0).withNano(0);
+            case "monthly" -> now.withDayOfMonth(1)
+                    .withHour(0).withMinute(0).withSecond(0).withNano(0);
+            default -> null;
         };
     }
 }

@@ -1,13 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { API_BASE_URL } from './config';
+const BASE = `${API_BASE_URL}/api/auth`;
 
 const EconomyContext = createContext();
-
 export function EconomyProvider({ children }) {
   const userId = localStorage.getItem("userId");
   const [loading, setLoading] = useState(true);
   
-  // React still needs initial state before the fetch completes, 
-  // but these won't be pushed to the DB.
   const [coins, setCoins] = useState(0); 
   const [keys, setKeys] = useState(0);
   const [showStore, setShowStore] = useState(false);
@@ -20,12 +19,11 @@ export function EconomyProvider({ children }) {
       return;
     }
 
-    // 🌟 1. FETCH PROGRESS ON LOAD (Purely reading data now)
-    fetch(`http://localhost:8081/api/progress/${userId}`)
+    // 🌟 ADDED /auth TO THIS URL
+    fetch(`${BASE}/progress/${userId}`)
       .then(res => res.json())
       .then(data => {
         if (data && data.userId) {
-          // Trust the backend data completely
           setCoins(data.coins);
           setKeys(data.keysCount);
           setUnlockedLevels({
@@ -35,6 +33,11 @@ export function EconomyProvider({ children }) {
             matching: data.matchingUnlocked,
             puzzle: data.puzzleUnlocked
           });
+        setGameScores(prev => ({
+            ...prev,
+            'map_explored_nodes': data.exploredMapNodes || [],
+            'unlocked_symbols_list': data.unlockedSymbols || []
+          }));
         }
       })
       .catch(err => console.error("Error loading progress:", err))
@@ -48,7 +51,8 @@ export function EconomyProvider({ children }) {
 
   const setGameUnlock = (game, level) => {
     setUnlockedLevels(prev => ({ ...prev, [game]: level }));
-    fetch(`http://localhost:8081/api/progress/unlock/${userId}`, {
+    
+    fetch(`${BASE}/progress/unlock/${userId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ game: game, level: level })

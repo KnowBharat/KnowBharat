@@ -4,22 +4,35 @@ import { apiFetch } from '../Hooks/useApi';
 import '../Css/ParentDashboard.css';
 import { CustomAlertModal, StoreModal } from './SharedModals'; // 🌟 Added StoreModal
 import { GAME_META } from './DashboardTabs/DashboardConstants';
-import { OverviewTab, PerformanceTab, ActivityTab, ProfileTab, SupportTab } from './DashboardTabs/DashboardViews'; 
+import { OverviewTab, PerformanceTab, ActivityTab, ProfileTab, SupportTab, MapProgressTab } from './DashboardTabs/DashboardViews';
 import { useEconomy } from '../Hooks/EconomyContext'; // 🌟 Added Economy
+import { API_BASE_URL } from '../Hooks/config';
+import useGameModal from '../Hooks/useGameModal';
+import useStateData from '../Hooks/useStateData';
 
+const BASE = `${API_BASE_URL}/api/auth`;
 export default function ParentDashboard() {
   const userId = localStorage.getItem("userId");
   const [activeTab, setActiveTab] = useState('overview');
   const [lbTimeRange, setLbTimeRange] = useState('daily'); // 🌟 Removed 'all', default to 'daily'
   const [activityFilter, setActivityFilter] = useState('All');
   const [showLogoutPrompt, setShowLogoutPrompt] = useState(false);
-  const [customAlert, setCustomAlert] = useState(null);
   const navigate = useNavigate();
 
-  // 🌟 Economy Context for Topbar & Store
-  const { coins, setCoins, keys, setKeys, showStore, setShowStore, gameScores } = useEconomy();
-
-  const [editForm, setEditForm] = useState({ firstName: '', lastName: '', childName: '' });
+  const { 
+    showStore, setShowStore, confirmAction, setConfirmAction, customAlert, setCustomAlert, 
+    claimDaily, watchAdCoins, watchAdKeys, 
+    buyCoinPack1, buyCoinPack2, buyCoinPack3,
+    buyKeyPack1, buyKeyPack2, buyKeyPack3,
+    buyCombo1, buyCombo2
+  } = useGameModal();
+  
+  const { stateIdMap } = useStateData();
+  const {
+    coins, setCoins, keys, setKeys,
+    unlockedLevels, setGameUnlock, gameScores, updateScoreData
+  } = useEconomy();
+  const [editForm, setEditForm] = useState({ childName: '', schoolName: '', studentClass: '', phone: '' });
   const [passMode, setPassMode] = useState('standard');
   const [passForm, setPassForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
   const [resetEmail, setResetEmail] = useState('');
@@ -34,37 +47,60 @@ export default function ParentDashboard() {
     childName: '',
     email: '',
     leaderboard: [],
-    moduleScores: {}, 
-    modulePlays: {}   
+    moduleScores: {},
+    modulePlays: {}
   });
 
   useEffect(() => {
-    apiFetch(`/dashboard/stats?timeRange=${lbTimeRange}`).then(data => {
-      if (data) {
-        const calcScores = {};
-        const calcPlays = {};
-        
-        (data.recentActivities || []).forEach(act => {
-           calcPlays[act.game] = (calcPlays[act.game] || 0) + 1;
-           calcScores[act.game] = (calcScores[act.game] || 0) + (act.score || 0);
-        });
+    if (!userId) {
+      navigate('/login');
+      return;
+    }
 
-        setStats({
-          ...data,
-          statesLearned: data.mapExploredCount || 0,
-          recentActivity: data.recentActivities || [], 
-          moduleScores: calcScores,
-          modulePlays: calcPlays
-        });
+    // 🌟 FIX: Reset stats to show loading state while waiting for BOTH calls
+    setStats(prev => ({ ...prev, totalScore: 0, recentActivity: [], scoreHistory: [] }));
 
-        setEditForm({
-          firstName: data.parentName?.split(' ')[0] || '',
-          lastName: data.parentName?.split(' ')[1] || '',
-          childName: data.childName || '',
-        });
-      }
-    }).catch(() => navigate('/login'));
-  }, [navigate, lbTimeRange]);
+    Promise.all([
+      apiFetch(`/dashboard/stats/${userId}?timeRange=${lbTimeRange}`),
+      apiFetch(`/game-data/score/overall/${userId}?filter=${lbTimeRange}`)
+    ])
+      .then(([statsData, scoresData]) => {
+        // 1. Process Stats Data
+        if (statsData && !statsData.error) {
+          const calcScores = {};
+          const calcPlays = {};
+
+          (statsData.recentActivities || []).forEach(act => {
+            calcPlays[act.game] = (calcPlays[act.game] || 0) + 1;
+            calcScores[act.game] = (calcScores[act.game] || 0) + (act.score || 0);
+          });
+
+          setStats(prev => ({
+            ...prev,
+            ...statsData, // Merges parentName, email, childName, leaderboard
+            statesLearned: statsData.mapExploredCount || 0,
+            exploredMapNodes: statsData.exploredMapNodes || [],
+            recentActivity: statsData.recentActivities || [],
+            moduleScores: calcScores,
+            modulePlays: calcPlays,
+            // 2. Process Score Data from the second API call
+            totalScore: scoresData?.totalScore || 0,
+            scoreHistory: scoresData?.scores || []
+          }));
+
+          setEditForm({
+            childName: statsData.childName || '',
+            schoolName: statsData.schoolName || '',
+            dob: statsData.dob || '',
+            phone: statsData.phone || ''
+          });
+        }
+      })
+      .catch(err => {
+        console.error("Dashboard fetch crash:", err);
+        // Only navigate to login if it's an auth-related error (optional)
+      });
+  }, [navigate, lbTimeRange, userId]);
 
   // ─── Handlers ─────────────────────────────────────────────────────────
   const handleLogout = async () => {
@@ -125,40 +161,6 @@ export default function ParentDashboard() {
     setFeedbackText('');
   };
 
-  // 🌟 STORE HANDLERS
-  const updateCurrencyDB = async (c, k) => {
-    try {
-      await fetch(`http://localhost:8081/api/progress/currency/${userId}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coins: c, keysCount: k })
-      });
-    } catch (err) { console.error("Failed to save currency", err); }
-  };
-
-  const watchAd = async () => { const c = coins+50, k = keys+1; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '📺', title: 'Reward Claimed!', text: '+50 Coins and +1 Key.' }); await updateCurrencyDB(c, k); };
-  const buyTokens = async () => { const c = coins+500, k = keys+10; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '💳', title: 'Purchase Successful!', text: '+500 Coins and +10 Keys.' }); await updateCurrencyDB(c, k); };
-  const claimDaily = async () => { const c = coins+100, k = keys+3; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '🎁', title: 'Daily Reward Claimed!', text: '+100 Coins and +3 Keys.' }); await updateCurrencyDB(c, k); };
-  const buyMegaPack = async () => { const c = coins+2000, k = keys+50; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '💎', title: 'Mega Pack Purchased!', text: '+2000 Coins and +50 Keys.' }); await updateCurrencyDB(c, k); };
-
-  // ── Derived Analytics ───────────────────────────────────────────────
-  const modulePerformance = useMemo(() => {
-    if (!stats.moduleScores) return [];
-    return Object.keys(stats.moduleScores).map(gameKey => {
-      const userScore = stats.moduleScores[gameKey];
-      const globalScore = stats.globalModuleAverages?.[gameKey] || 0;
-      const maxScale = Math.max(1000, userScore, globalScore) * 1.1;
-
-      return {
-        game: gameKey,
-        label: GAME_META[gameKey]?.label || gameKey,
-        color: GAME_META[gameKey]?.color || '#888',
-        avgScore: userScore,
-        globalAvg: globalScore,
-        widthPct: Math.min((userScore / maxScale) * 100, 100),
-        globalWidthPct: Math.min((globalScore / maxScale) * 100, 100),
-      };
-    }).sort((a, b) => b.avgScore - a.avgScore);
-  }, [stats.moduleScores, stats.globalModuleAverages]);
-
   const heatmapData = useMemo(() => {
     if (!stats.modulePlays) return [];
     return Object.keys(GAME_META).map(key => ({
@@ -182,25 +184,32 @@ export default function ParentDashboard() {
   }, [stats.recentActivity, activityFilter]);
 
   // 🌟 DERIVE MAP LEVEL-WISE COUNT
-  const mapLevelCounts = useMemo(() => {
-    const mapNodes = gameScores['map_explored_nodes'] || [];
-    const counts = {};
+  const mapLevelDetails = useMemo(() => {
+    const mapNodes = stats.exploredMapNodes || [];
+    const details = {};
+    for (let i = 1; i <= 11; i++) { details[i] = []; }
+
     mapNodes.forEach(node => {
-      const match = node.match(/lvl (\d+)/);
+      const match = node.match(/(.+) lvl (\d+)/);
       if (match) {
-        const lvl = parseInt(match[1], 10);
-        counts[lvl] = (counts[lvl] || 0) + 1;
+        const stateCode = match[1];
+        const lvl = parseInt(match[2], 10);
+
+        // 🌟 ADDED !details[lvl].includes(stateCode) to prevent duplicates!
+        if (details[lvl] && !details[lvl].includes(stateCode)) {
+          details[lvl].push(stateCode);
+        }
       }
     });
-    return counts;
-  }, [gameScores]);
+    return details;
+  }, [stats.exploredMapNodes]);
 
   return (
     <div className="pd-root">
       <aside className="pd-sidebar">
         <div className="pd-brand">
           <div className="pd-brand-logo">
-            <img src="/KnowBharat.png" alt="KnowBharat Logo" className="logo" width="50" height="50" />
+            <img src="/KnowBharat.webp" alt="KnowBharat Logo" className="logo" width="50" height="50" />
           </div>
           <div className="pd-brand-name">KnowBharat</div>
           <div className="pd-brand-sub">Parent Portal</div>
@@ -210,6 +219,7 @@ export default function ParentDashboard() {
           {[
             { id: 'overview', icon: '📊', label: 'Overview' },
             { id: 'performance', icon: '📈', label: 'Performance' },
+            { id: 'map-progress', icon: '🗺️', label: 'Map Progress' }, // 🌟 ADDED MAP ICON HERE
             { id: 'activity', icon: '📝', label: 'Activity Log' },
             { id: 'profile', icon: '⚙️', label: 'Edit Profile' },
             { id: 'support', icon: '🎧', label: 'Help & Support' },
@@ -238,54 +248,73 @@ export default function ParentDashboard() {
         <div className="pd-topbar">
           <div className="pd-topbar-title">Parent Dashboard</div>
           <div className="pd-topbar-right">
-            
+
             {/* 🌟 ECONOMY TOPBAR */}
-            <div className="pd-economy-bar" onClick={() => setShowStore(true)} style={{display: 'flex', gap: '15px', marginRight: '20px', cursor: 'pointer', background: '#f5f5f5', padding: '8px 15px', borderRadius: '20px', border: '1px solid #ddd', alignItems: 'center'}}>
-              <div style={{fontWeight: 'bold', color: '#FF9933'}}>🪙 {coins}</div>
-              <div style={{fontWeight: 'bold', color: '#06d6a0'}}>🗝️ {keys}</div>
-              <div style={{fontSize: '0.8rem', color: '#666', background: '#e0e0e0', padding: '2px 8px', borderRadius: '10px'}}>➕ Store</div>
+            <div className="pd-economy-bar" onClick={() => setShowStore(true)} style={{ display: 'flex', gap: '15px', marginRight: '20px', cursor: 'pointer', background: '#f5f5f5', padding: '8px 15px', borderRadius: '20px', border: '1px solid #ddd', alignItems: 'center' }}>
+              <div style={{ fontWeight: 'bold', color: '#FF9933' }}>🪙 {coins}</div>
+              <div style={{ fontWeight: 'bold', color: '#06d6a0' }}>🗝️ {keys}</div>
+              <div style={{ fontSize: '0.8rem', color: '#666', background: '#e0e0e0', padding: '2px 8px', borderRadius: '10px' }}>➕ Store</div>
             </div>
 
-            <div><div className="pd-parent-name">Welcome, {stats.parentName || 'Parent'}</div></div>
-            <div className="pd-avatar">{stats.parentName?.[0] || 'P'}</div>
-          </div>
+            <div><div className="pd-parent-name">Welcome, {stats.childName || 'Student'}</div></div>
+<div className="pd-avatar">{stats.childName?.[0] || 'S'}</div>
+</div>
         </div>
 
         <div className="pd-content">
           {activeTab === 'overview' && (
-             <OverviewTab 
-                stats={stats} 
-                heatmapData={heatmapData} 
-                globalLeaderboard={globalLeaderboard} 
-                lbTimeRange={lbTimeRange} 
-                setLbTimeRange={setLbTimeRange} 
-                setActiveTab={setActiveTab} 
-                viewDetailsInLog={(key) => { setActivityFilter(key); setActiveTab('activity'); }} 
-                mapLevelCounts={mapLevelCounts} // 🌟 Passed Map Data
-                onOwnProfileClick={() => setActiveTab('performance')} // 🌟 Passed Click Handler
-             />
+            <OverviewTab
+              stats={stats} heatmapData={heatmapData} globalLeaderboard={globalLeaderboard}
+              lbTimeRange={lbTimeRange} setLbTimeRange={setLbTimeRange}
+              setActiveTab={setActiveTab} viewDetailsInLog={(key) => { setActivityFilter(key); setActiveTab('activity'); }}
+              mapLevelDetails={mapLevelDetails} onOwnProfileClick={() => setActiveTab('performance')}
+            />
           )}
-          
-          {activeTab === 'performance' && <PerformanceTab modulePerformance={modulePerformance} />}
-          
-          {activeTab === 'activity' && <ActivityTab stats={stats} activityFilter={activityFilter} setActivityFilter={setActivityFilter} displayActivityLog={displayActivityLog} />}
-          
+
+          {activeTab === 'performance' && (
+            <PerformanceTab
+              stats={stats}
+              lbTimeRange={lbTimeRange}
+              setLbTimeRange={setLbTimeRange}
+            />
+          )}
+          {/* 🌟 PASSED TIME RANGE PROPS TO ACTIVITY */}
+          {activeTab === 'activity' && <ActivityTab stats={stats} activityFilter={activityFilter} setActivityFilter={setActivityFilter} displayActivityLog={displayActivityLog} lbTimeRange={lbTimeRange} setLbTimeRange={setLbTimeRange} />}
+
+          {/* 🌟 PASS stateIdMap TO THE TAB */}
+          {activeTab === 'map-progress' && <MapProgressTab mapLevelDetails={mapLevelDetails} stateIdMap={stateIdMap} />}
+
           {activeTab === 'profile' && (
-             <ProfileTab 
-               stats={stats} editForm={editForm} setEditForm={setEditForm} handleEditSubmit={handleEditSubmit}
-               passMode={passMode} setPassMode={setPassMode} passForm={passForm} setPassForm={setPassForm} handlePasswordChange={handlePasswordChange}
-               resetEmail={resetEmail} setResetEmail={setResetEmail} handleForgotPassRequest={handleForgotPassRequest}
-               resetOtp={resetOtp} setResetOtp={setResetOtp} handleResetPassSubmit={handleResetPassSubmit}
-             />
+            <ProfileTab
+              stats={stats} editForm={editForm} setEditForm={setEditForm} handleEditSubmit={handleEditSubmit}
+              passMode={passMode} setPassMode={setPassMode} passForm={passForm} setPassForm={setPassForm} handlePasswordChange={handlePasswordChange}
+              resetEmail={resetEmail} setResetEmail={setResetEmail} handleForgotPassRequest={handleForgotPassRequest}
+              resetOtp={resetOtp} setResetOtp={setResetOtp} handleResetPassSubmit={handleResetPassSubmit}
+            />
           )}
 
           {activeTab === 'support' && (
-             <SupportTab feedbackText={feedbackText} setFeedbackText={setFeedbackText} handleFeedbackSubmit={handleFeedbackSubmit} />
+            <SupportTab feedbackText={feedbackText} setFeedbackText={setFeedbackText} handleFeedbackSubmit={handleFeedbackSubmit} />
           )}
         </div>
       </main>
 
-      <StoreModal show={showStore} onClose={() => setShowStore(false)} onWatchAd={watchAd} onBuyTokens={buyTokens} onDailyReward={claimDaily} onBuyMegaPack={buyMegaPack} />
+      <StoreModal
+        show={showStore}
+        onClose={() => setShowStore(false)}
+        isParent={true} 
+        onDailyReward={claimDaily}
+        onWatchAdCoins={watchAdCoins}
+        onWatchAdKeys={watchAdKeys}
+        onBuyCoin1={buyCoinPack1}
+        onBuyCoin2={buyCoinPack2}
+        onBuyCoin3={buyCoinPack3}
+        onBuyKey1={buyKeyPack1}
+        onBuyKey2={buyKeyPack2}
+        onBuyKey3={buyKeyPack3}
+        onBuyCombo1={buyCombo1}
+        onBuyCombo2={buyCombo2}
+      />
       <CustomAlertModal alert={customAlert} onClose={handleCloseAlert} />
 
       {showLogoutPrompt && (

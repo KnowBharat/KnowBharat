@@ -1,4 +1,3 @@
-// entity/ActiveSession.java
 package com.knowbharat.backend.entity;
 
 import jakarta.persistence.*;

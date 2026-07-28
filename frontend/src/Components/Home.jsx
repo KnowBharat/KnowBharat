@@ -3,18 +3,28 @@ import { useNavigate } from 'react-router-dom';
 import '../Css/Home.css';
 import { apiFetch } from '../Hooks/useApi';
 import { useEconomy } from '../Hooks/EconomyContext';
-import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals'; 
+import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals';
 import '../Css/LevelPickerPage.css';
+import { API_BASE_URL } from '../Hooks/config';
+import useGameModal from '../Hooks/useGameModal';
+const BASE = `${API_BASE_URL}/api/auth`;
 
 export default function KidsHome() {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
 
-  const { coins, setCoins, keys, setKeys, showStore, setShowStore, gameScores, unlockedLevels, setGameUnlock } = useEconomy();
-  
-  const [confirmAction, setConfirmAction] = useState(null); 
-  const [customAlert, setCustomAlert] = useState(null);
-  
+  const {
+    coins, setCoins, keys, setKeys,
+    unlockedLevels, setGameUnlock, gameScores, updateScoreData
+  } = useEconomy();
+  const { 
+    showStore, setShowStore, confirmAction, setConfirmAction, customAlert, setCustomAlert, 
+    claimDaily, watchAdCoins, watchAdKeys, 
+    buyCoinPack1, buyCoinPack2, buyCoinPack3,
+    buyKeyPack1, buyKeyPack2, buyKeyPack3,
+    buyCombo1, buyCombo2
+  } = useGameModal();
+
   // Parent Switch & Auth State
   const [showParentAuth, setShowParentAuth] = useState(false);
   const [parentAuthMode, setParentAuthMode] = useState('password');
@@ -32,7 +42,6 @@ export default function KidsHome() {
     }
   }, []);
 
-  // 🌟 Cleanly floor the decimals (e.g., 2.3 -> Level 2) for the UI checks
   const nsUnlockedCount = (gameScores['unlocked_symbols_list'] || []).length;
   const mapUnlocked = unlockedLevels.map || 0;
   const puzzleUnlocked = Math.floor(unlockedLevels.puzzle || 0);
@@ -40,14 +49,13 @@ export default function KidsHome() {
   const quizUnlocked = Math.floor(unlockedLevels.quiz || 0);
   const spellUnlocked = Math.floor(unlockedLevels.spell || 0);
 
-  // 🌟 INCREASED EARLY UNLOCK KEY COSTS TO MATCH THE NEW ECONOMY
   const MODULES = [
-    { id: 1, route: '/national', title: 'National Symbols', game: 'symbols', img: '/flag.png', unlockCost: 0, description: "Learn about India's national symbols!", isUnlocked: true, reqText: "" },
-    { id: 2, route: '/map', title: 'View the Map', game: 'map', img: '/map.jpg', unlockCost: 35, description: 'Explore states on an interactive map!', isUnlocked: mapUnlocked >= 1 || nsUnlockedCount >= 10, reqText: `Unlock 10 Symbols (${nsUnlockedCount}/10)` },
-    { id: 3, route: '/puzzle', title: 'Solve the Puzzle', game: 'puzzle', img: '/puzzle.png', unlockCost: 75, description: 'Put the pieces together!', isUnlocked: puzzleUnlocked >= 1 || mapUnlocked >= 10, reqText: `Reach Map Level 10 (${mapUnlocked}/10)` },
-    { id: 4, route: '/matching', title: 'Matching Game', game: 'matching', img: '/matching.png', unlockCost: 120, description: 'Match states with their famous things!', isUnlocked: matchingUnlocked >= 1 || puzzleUnlocked >= 5, reqText: `Reach Puzzle Level 5 (${puzzleUnlocked}/5)` },
-    { id: 5, route: '/quiz', title: 'Quiz Master', game: 'quiz', img: '/quiz.png', unlockCost: 250, description: 'Challenge yourself with the ultimate quiz!', isUnlocked: quizUnlocked >= 1 || matchingUnlocked >= 5, reqText: `Reach Match Level 5 (${matchingUnlocked}/5)` },
-    { id: 6, route: '/spell', title: 'Spell Check', game: 'spell', img: '/spelling.jpg', unlockCost: 180, description: 'Test your spelling with fun words!', isUnlocked: spellUnlocked >= 1 || quizUnlocked >= 5, reqText: `Reach Quiz Level 5 (${quizUnlocked}/5)` }
+    { id: 1, route: '/national', title: 'National Symbols', game: 'symbols', img: '/flag.webp', unlockCost: 0, description: "Learn about India's national symbols!", isUnlocked: true, reqText: "" },
+    { id: 2, route: '/map', title: 'View the Map', game: 'map', img: '/map.webp', unlockCost: 35, description: 'Explore states on an interactive map!', isUnlocked: mapUnlocked >= 1 || nsUnlockedCount >= 10, reqText: `Unlock 10 Symbols (${nsUnlockedCount}/10)` },
+    { id: 3, route: '/puzzle', title: 'Solve the Puzzle', game: 'puzzle', img: '/puzzle.webp', unlockCost: 75, description: 'Put the pieces together!', isUnlocked: puzzleUnlocked >= 1 || mapUnlocked >= 10, reqText: `Reach Map Level 10 (${mapUnlocked}/10)` },
+    { id: 4, route: '/matching', title: 'Matching Game', game: 'matching', img: '/matching.webp', unlockCost: 120, description: 'Match states with their famous things!', isUnlocked: matchingUnlocked >= 1 || puzzleUnlocked >= 5, reqText: `Reach Puzzle Level 5 (${puzzleUnlocked}/5)` },
+    { id: 5, route: '/quiz', title: 'Quiz Master', game: 'quiz', img: '/quiz.webp', unlockCost: 150, description: 'Challenge yourself with the ultimate quiz!', isUnlocked: quizUnlocked >= 1 || matchingUnlocked >= 5, reqText: `Reach Match Level 5 (${matchingUnlocked}/5)` },
+    { id: 6, route: '/spell', title: 'Spell Check', game: 'spell', img: '/spelling.webp', unlockCost: 180, description: 'Test your spelling with fun words!', isUnlocked: spellUnlocked >= 1 || quizUnlocked >= 5, reqText: `Reach Quiz Level 5 (${quizUnlocked}/5)` }
   ];
 
   const handleCardClick = (module) => {
@@ -68,16 +76,16 @@ export default function KidsHome() {
   const executeUnlock = async () => {
     const { module } = confirmAction;
     const cost = module.unlockCost;
-    setConfirmAction(null); 
+    setConfirmAction(null);
 
     if (keys >= cost) {
       const newKeys = keys - cost;
-      
+
       setKeys(newKeys);
       setGameUnlock(module.game, 1);
-      
+
       try {
-        await fetch(`http://localhost:8081/api/progress/currency/${userId}`, {
+        await fetch(`${BASE}/progress/currency/${userId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ coins: coins, keysCount: newKeys })
@@ -102,7 +110,7 @@ export default function KidsHome() {
   const handleParentAuthSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     if (!localStorage.getItem('token')) {
       setCustomAlert({ type: 'error', icon: '⚠️', title: 'Session Expired', text: 'Please log in again.' });
       setShowParentAuth(false);
@@ -110,12 +118,12 @@ export default function KidsHome() {
       navigate('/login');
       return;
     }
-    
+
     const res = await apiFetch('/verify-password', {
       method: 'POST',
       body: JSON.stringify({ password: parentPassword })
     });
-    
+
     setIsLoading(false);
     if (res && res.message === "Access Granted") {
       navigate('/parent-dashboard');
@@ -123,6 +131,32 @@ export default function KidsHome() {
       setCustomAlert({ type: 'error', icon: '❌', title: 'Access Denied', text: res?.error || 'Incorrect password.' });
     }
     setParentPassword('');
+  };
+
+  // 🌟 NEW: Handle Forgot Password OTP Request
+  const handleForgotPassRequest = async (e) => {
+    e.preventDefault();
+    const res = await apiFetch('/forgot-password-otp', { method: 'POST', body: JSON.stringify({ email: resetEmail }) });
+    if (res && !res.error) {
+      setParentAuthMode('reset'); // Move to OTP Screen
+    } else {
+      setCustomAlert({ type: 'error', icon: '❌', title: 'Not Found', text: res?.error || 'Email not registered.' });
+    }
+  };
+
+  // 🌟 NEW: Handle Reset Password Submit
+  const handleResetPassSubmit = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      return setCustomAlert({ type: 'error', icon: '❌', title: 'Error', text: 'New passwords do not match!' });
+    }
+    const res = await apiFetch('/reset-password', { method: 'POST', body: JSON.stringify({ email: resetEmail, otp: resetOtp, newPassword }) });
+    if (res && !res.error) {
+      setCustomAlert({ type: 'success', icon: '✅', title: 'Success', text: 'Password Reset Successfully!' });
+      resetModalState(); // Send them back to the standard password login screen
+    } else {
+      setCustomAlert({ type: 'error', icon: '❌', title: 'Error', text: res?.error || 'Invalid OTP.' });
+    }
   };
 
   const resetModalState = () => {
@@ -134,19 +168,6 @@ export default function KidsHome() {
     setNewPassword('');
     setConfirmPassword('');
   };
-
-  const updateCurrencyDB = async (c, k) => {
-    try {
-      await fetch(`http://localhost:8081/api/progress/currency/${userId}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coins: c, keysCount: k })
-      });
-    } catch (err) { console.error("Failed to save currency", err); }
-  };
-
-  const watchAd = async () => { const c = coins+50, k = keys+1; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '📺', title: 'Reward Claimed!', text: '+50 Coins and +1 Key.' }); await updateCurrencyDB(c, k); };
-  const buyTokens = async () => { const c = coins+500, k = keys+10; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '💳', title: 'Purchase Successful!', text: '+500 Coins and +10 Keys.' }); await updateCurrencyDB(c, k); };
-  const claimDaily = async () => { const c = coins+100, k = keys+3; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '🎁', title: 'Daily Reward Claimed!', text: '+100 Coins and +3 Keys.' }); await updateCurrencyDB(c, k); };
-  const buyMegaPack = async () => { const c = coins+2000, k = keys+50; setCoins(c); setKeys(k); setShowStore(false); setCustomAlert({ type: 'success', icon: '💎', title: 'Mega Pack Purchased!', text: '+2000 Coins and +50 Keys.' }); await updateCurrencyDB(c, k); };
 
   return (
     <main className="container">
@@ -175,6 +196,8 @@ export default function KidsHome() {
 
       {showParentAuth && (
         <div className="modal-overlay">
+
+          {/* STANDARD PASSWORD LOGIN */}
           {parentAuthMode === 'password' && (
             <form className="auth-modal" onSubmit={handleParentAuthSubmit}>
               <h2>Parent Access</h2>
@@ -189,24 +212,61 @@ export default function KidsHome() {
               </div>
             </form>
           )}
+
+          {/* 🌟 NEW: FORGOT PASSWORD FORM */}
+          {parentAuthMode === 'forgot' && (
+            <form className="auth-modal" onSubmit={handleForgotPassRequest}>
+              <h2>Reset Password</h2>
+              <p>Enter your registered email to receive an OTP.</p>
+              <input type="email" placeholder="Your Email" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} required className="auth-input" />
+              <div className="auth-modal-btns">
+                <button type="submit" className="btn-auth-primary">Send OTP</button>
+                <button type="button" className="btn-auth-cancel" onClick={resetModalState}>Cancel</button>
+              </div>
+            </form>
+          )}
+
+          {/* 🌟 NEW: OTP AND RESET FORM */}
+          {parentAuthMode === 'reset' && (
+            <form className="auth-modal" onSubmit={handleResetPassSubmit}>
+              <h2>Enter OTP</h2>
+              <p>Check your email for the reset code.</p>
+              <input type="text" placeholder="OTP Code" value={resetOtp} onChange={(e) => setResetOtp(e.target.value)} required className="auth-input" />
+              <input type="password" placeholder="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required className="auth-input" />
+              <input type="password" placeholder="Confirm New Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="auth-input" />
+              <div className="auth-modal-btns">
+                <button type="submit" className="btn-auth-primary" style={{ background: '#4caf50' }}>Reset Password</button>
+                <button type="button" className="btn-auth-cancel" onClick={resetModalState}>Cancel</button>
+              </div>
+            </form>
+          )}
+
         </div>
       )}
 
-      <ConfirmActionModal 
-        confirmAction={confirmAction} 
-        onConfirm={executeUnlock} 
-        onCancel={() => setConfirmAction(null)} 
+      <ConfirmActionModal
+        confirmAction={confirmAction}
+        onConfirm={executeUnlock}
+        onCancel={() => setConfirmAction(null)}
       />
 
-      <StoreModal 
-        show={showStore} 
-        onClose={() => setShowStore(false)} 
-        onWatchAd={watchAd} 
-        onBuyTokens={buyTokens} 
-        onDailyReward={claimDaily} 
-        onBuyMegaPack={buyMegaPack} 
+      <StoreModal
+        show={showStore}
+        onClose={() => setShowStore(false)}
+        isParent={true} 
+        onDailyReward={claimDaily}
+        onWatchAdCoins={watchAdCoins}
+        onWatchAdKeys={watchAdKeys}
+        onBuyCoin1={buyCoinPack1}
+        onBuyCoin2={buyCoinPack2}
+        onBuyCoin3={buyCoinPack3}
+        onBuyKey1={buyKeyPack1}
+        onBuyKey2={buyKeyPack2}
+        onBuyKey3={buyKeyPack3}
+        onBuyCombo1={buyCombo1}
+        onBuyCombo2={buyCombo2}
       />
-      
+
       <CustomAlertModal alert={customAlert} onClose={() => setCustomAlert(null)} />
     </main>
   );

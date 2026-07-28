@@ -46,7 +46,7 @@ function GameLayout({ children }) {
         <div className="header-left">
           {/* fetchpriority="high" helps LCP score by loading the logo early */}
           <img
-            src="/KnowBharat.png"
+            src="/KnowBharat.webp"
             alt="KnowBharat Logo"
             className="logo"
             fetchpriority="high"

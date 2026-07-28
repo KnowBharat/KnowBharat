@@ -27,8 +27,6 @@ public class UserService {
     @Autowired private ActiveSessionRepository activeSessionRepository;
     @Autowired private JavaMailSender mailSender;
 
-
-    // 🌟 NEW REPOSITORIES WIRED IN
     @Autowired private GameScoreRepository scoreRepository;
     @Autowired private GameActivityRepository activityRepository;
     @Autowired private UserProgressRepository progressRepository;
@@ -58,7 +56,7 @@ public class UserService {
 
 
         String subject = "Welcome to KnowBharat - Verification Code";
-        String body = "Hello,\n\nYour OTP for KnowBharat parent registration is: " + otp + "\n\nThis code will expire in 5 minutes.";
+        String body = "Hello,\n\nYour OTP for KnowBharat registration is: " + otp + "\n\nThis code will expire in 5 minutes.";
         sendEmail(cleanEmail, subject, body);
     }
 
@@ -73,21 +71,30 @@ public class UserService {
         }
 
         User user = new User();
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
         user.setChildName(request.getChildName());
+        user.setSchoolName(request.getSchoolName());
+        user.setDob(request.getDob());
+        user.setPhone(request.getPhone());
         user.setEmail(cleanEmail);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole("parent");
+        user.setRole("student");
 
-        // 1. Save the user first so they get an ID
         User savedUser = userRepository.save(user);
 
-        // 🌟 2. INSTANTLY CREATE THEIR DEFAULT PROGRESS
+        // Generate 3 Unique Random Symbols (Assuming IDs are 1 to 20)
+        List<String> randomSymbols = new ArrayList<>();
+        Random rand = new Random();
+        while(randomSymbols.size() < 3) {
+            String randId = String.valueOf(rand.nextInt(20) + 1);
+            if(!randomSymbols.contains(randId)) randomSymbols.add(randId);
+        }
+
+        // Instantly Create Progress with 100 Coins, 5 Keys, and 3 Random Symbols
         UserProgress progress = new UserProgress();
-        progress.setUser(savedUser); // @MapsId automatically handles the ID binding here!
-        progress.setCoins(100);    // Default Coins
-        progress.setKeysCount(5);  // Default Keys
+        progress.setUser(savedUser);
+        progress.setCoins(100);
+        progress.setKeysCount(5);
+        progress.setUnlockedSymbols(randomSymbols);
         progressRepository.save(progress);
 
         otpStorage.remove(cleanEmail);
@@ -153,7 +160,7 @@ public class UserService {
 
 
         String subject = "KnowBharat - Password Reset";
-        String body = "Hello " + user.getFirstName() + ",\n\nYou requested a password reset. Your OTP is: " + otp + "\n\nThis code will expire in 5 minutes.";
+        String body = "Hello " + user.getChildName() + ",\n\nYou requested a password reset. Your OTP is: " + otp + "\n\nThis code will expire in 5 minutes.";
         sendEmail(user.getEmail(), subject, body);
     }
 
@@ -189,9 +196,10 @@ public class UserService {
 
     public void editProfile(Long userId, EditProfileRequest request) {
         User user = userRepository.findById(userId).orElseThrow();
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
         user.setChildName(request.getChildName());
+        user.setSchoolName(request.getSchoolName());
+        user.setDob(request.getDob());
+        user.setPhone(request.getPhone());
         userRepository.save(user);
     }
 
@@ -207,7 +215,7 @@ public class UserService {
     }
 
 
-    // 🌟 UPDATED: Now saves cleanly to the new GameActivity table!
+    // Now saves cleanly to the new GameActivity table!
     @Transactional
     public void recordActivity(Long userId, String game, Integer score, String stateName) {
         User user = userRepository.findById(userId).orElseThrow();
@@ -243,7 +251,7 @@ public class UserService {
                 ? activityRepository.findByUserIdAndTimestampAfterOrderByTimestampDesc(userId, cutoffDate)
                 : activityRepository.findByUserIdAndGame(userId, "all");
 
-        // 🌟 UPDATED: Get states directly from UserProgress JSON array
+        // Get states directly from UserProgress JSON array
         UserProgress progress = progressRepository.findById(userId).orElse(new UserProgress());
         Set<String> uniqueStates = progress.getExploredMapNodes().stream()
                 .map(node -> node.split(" lvl ")[0]) // Extracts "West Bengal" from "West Bengal lvl 1"
@@ -264,13 +272,13 @@ public class UserService {
             }
 
             if (userScore > 0) {
-                String displayName = (u.getChildName() != null && !u.getChildName().isEmpty()) ? u.getChildName() : u.getFirstName();
+                String displayName = (u.getChildName() != null && !u.getChildName().isEmpty()) ? u.getChildName() : "Student";
                 leaderboard.add(new DashboardStatsResponse.LeaderboardEntry(displayName, userScore, u.getId().equals(userId)));
             }
         }
 
         leaderboard.sort((a, b) -> b.getScore() - a.getScore());
-        if (leaderboard.size() > 5) leaderboard = leaderboard.subList(0, 5);
+        if (leaderboard.size() > 10) leaderboard = leaderboard.subList(0, 10);
 
         // Map activities to DTOs for frontend
         List<ActivityDto> activityDtos = recentActivities.stream().limit(10).map(a ->
@@ -278,14 +286,13 @@ public class UserService {
         ).toList();
 
         return new DashboardStatsResponse(
-                totalScore,
-                uniqueStates.size(),
-                activityDtos,
-                new ArrayList<>(uniqueStates).stream().limit(5).toList(),
-                user.getFirstName() + " " + user.getLastName(),
-                user.getChildName(),
-                user.getEmail(),
-                leaderboard
+                totalScore,                             // 1
+                uniqueStates.size(),                   // 2
+                activityDtos,                          // 3
+                new ArrayList<>(uniqueStates).stream().limit(5).toList(), // 4
+                user.getChildName(),                   // 5
+                user.getEmail(),                       // 6
+                leaderboard                            // 7
         );
     }
 }

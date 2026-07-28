@@ -1,5 +1,5 @@
-// Hooks/useApi.js
-const BASE = 'http://localhost:8081/api/auth';
+import { API_BASE_URL } from './config';
+const BASE = `${API_BASE_URL}/api/auth`; // 🌟 Restored to /auth
 
 function authHeaders() {
   const token = localStorage.getItem('token');
@@ -18,24 +18,34 @@ export async function apiFetch(path, options = {}) {
     const ct = res.headers.get('content-type') || '';
     if (!ct.includes('application/json')) return null;
     return await res.json();
-  } catch {
-    return null; // never crash gameplay
+  } catch (err) {
+    console.error("API Fetch Error:", err);
+    return null; 
   }
 }
 
-// ── Convenience wrappers ──────────────────────────────────────────────────────
-
 // Call when any game round ends with a score
 export async function trackScore(game, score, stateName = null) {
-  return apiFetch('/dashboard/activity', {
+  const userId = localStorage.getItem("userId");
+  if (!userId) return null;
+
+  // 🌟 1. Save to GameScore table (Updates Leaderboard, Performance, and Total Score)
+  apiFetch(`/game-data/score/${userId}`, {
+    method: 'POST',
+    body: JSON.stringify({ game, score, stateName }),
+  }).catch(err => console.error("Failed to save score:", err));
+
+  // 🌟 2. Save to GameActivity table (Updates the Recent Activity Log)
+  return apiFetch(`/game-data/activity/${userId}`, {
     method: 'POST',
     body: JSON.stringify({ game, score, stateName }),
   });
 }
 
-// Call when a state is clicked / loaded in any component
 export async function trackStateVisit(stateName) {
-  return apiFetch('/dashboard/activity', {
+  const userId = localStorage.getItem("userId");
+  if (!userId) return null;
+  return apiFetch(`/game-data/activity/${userId}`, {
     method: 'POST',
     body: JSON.stringify({ game: 'map', score: null, stateName }),
   });

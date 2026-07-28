@@ -3,13 +3,15 @@ package com.knowbharat.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "tourist_places")
-public class TouristPlace {
+public class TouristPlace implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
