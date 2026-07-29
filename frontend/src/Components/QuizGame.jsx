@@ -12,7 +12,7 @@ import useGameModal from '../Hooks/useGameModal';
 const BASE = `${API_BASE_URL}/api`;
 const PICTURE_CATS = new Set(['symbols', 'food', 'festival', 'wear', 'place']);
 const QS_PER_ROUND = 5; 
-const MIN_CORRECT_TO_PASS = 3; // 🌟 Passing requirement
+const MIN_CORRECT_TO_PASS = 3; 
 
 const ROUNDS = [
   { n: 2, label: 'Easy', sub: '2 Options', emoji: '🌱', color: '#06d6a0', points: 1 },
@@ -25,7 +25,7 @@ const LEVEL_NUMS = {
   'food': 5, 'festival': 6, 'place': 7, 'wear': 8, 'establish': 9, 'mix': 10
 };
 
-// 🌟 KEYS: Cost to unlock early (1.1 is never locked)
+// Cost to unlock early (1.1 is never locked)
 const getRoundKeyCost = (cat, levelNum, rIdx) => {
   if (levelNum === 1 && rIdx === 0) return 0; // 1.1 is ALWAYS FREE                 
   if (cat === 'symbols') return 1;                   
@@ -35,9 +35,9 @@ const getRoundKeyCost = (cat, levelNum, rIdx) => {
   return 3;
 };
 
-// 🌟 COINS: Cost to play (1.1 is Free, rest cost coins)
+//  Cost to play (1.1 is Free, rest cost coins)
 const getRoundCoinCost = (cat, levelNum, rIdx) => {
-  if (levelNum === 1 && rIdx === 0) return 0; // 🌟 1.1 is ALWAYS FREE
+  if (levelNum === 1 && rIdx === 0) return 0; // 1.1 is ALWAYS FREE
   if (cat === 'symbols') return [11, 11, 13][rIdx]; 
   if (cat === 'capital' || cat === 'language' || cat === 'geography') return [13, 13, 17][rIdx];
   if (cat === 'food' || cat === 'festival' || cat === 'place') return [17, 17, 21][rIdx];
@@ -168,7 +168,7 @@ const {
   const [phase, setPhase] = useState('loading');
   const [showWin, setShowWin] = useState(false);
 
-  // 🌟 DECIMAL PARSING: 1.1 = Level 1 Round 1.
+  // DECIMAL PARSING: 1.1 = Level 1 Round 1.
   const quizFloatVal = Math.round((unlockedLevels.quiz || 1.1) * 10); 
   
   const isRoundUnlocked = (rIdx) => {
@@ -460,7 +460,7 @@ const {
     );
   }
 
-  // 🌟 NEW FAIL PHASE
+  // NEW FAIL PHASE
   if (phase === 'round-fail') {
     const displayPlayCost = roundPlayCost === 0 ? 'Free' : `🪙 ${roundPlayCost}`;
     return (

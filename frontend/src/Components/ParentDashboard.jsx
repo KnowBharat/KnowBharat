@@ -2,10 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../Hooks/useApi';
 import '../Css/ParentDashboard.css';
-import { CustomAlertModal, StoreModal } from './SharedModals'; // 🌟 Added StoreModal
+import { CustomAlertModal, StoreModal } from './SharedModals'; 
 import { GAME_META } from './DashboardTabs/DashboardConstants';
 import { OverviewTab, PerformanceTab, ActivityTab, ProfileTab, SupportTab, MapProgressTab } from './DashboardTabs/DashboardViews';
-import { useEconomy } from '../Hooks/EconomyContext'; // 🌟 Added Economy
+import { useEconomy } from '../Hooks/EconomyContext'; 
 import { API_BASE_URL } from '../Hooks/config';
 import useGameModal from '../Hooks/useGameModal';
 import useStateData from '../Hooks/useStateData';
@@ -14,7 +14,7 @@ const BASE = `${API_BASE_URL}/api/auth`;
 export default function ParentDashboard() {
   const userId = localStorage.getItem("userId");
   const [activeTab, setActiveTab] = useState('overview');
-  const [lbTimeRange, setLbTimeRange] = useState('daily'); // 🌟 Removed 'all', default to 'daily'
+  const [lbTimeRange, setLbTimeRange] = useState('daily'); 
   const [activityFilter, setActivityFilter] = useState('All');
   const [showLogoutPrompt, setShowLogoutPrompt] = useState(false);
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ export default function ParentDashboard() {
       return;
     }
 
-    // 🌟 FIX: Reset stats to show loading state while waiting for BOTH calls
+    // Reset stats to show loading state while waiting for BOTH calls
     setStats(prev => ({ ...prev, totalScore: 0, recentActivity: [], scoreHistory: [] }));
 
     Promise.all([
@@ -98,7 +98,6 @@ export default function ParentDashboard() {
       })
       .catch(err => {
         console.error("Dashboard fetch crash:", err);
-        // Only navigate to login if it's an auth-related error (optional)
       });
   }, [navigate, lbTimeRange, userId]);
 
@@ -183,7 +182,6 @@ export default function ParentDashboard() {
     return stats.recentActivity.filter(a => a.game === activityFilter);
   }, [stats.recentActivity, activityFilter]);
 
-  // 🌟 DERIVE MAP LEVEL-WISE COUNT
   const mapLevelDetails = useMemo(() => {
     const mapNodes = stats.exploredMapNodes || [];
     const details = {};
@@ -195,7 +193,6 @@ export default function ParentDashboard() {
         const stateCode = match[1];
         const lvl = parseInt(match[2], 10);
 
-        // 🌟 ADDED !details[lvl].includes(stateCode) to prevent duplicates!
         if (details[lvl] && !details[lvl].includes(stateCode)) {
           details[lvl].push(stateCode);
         }
@@ -219,7 +216,7 @@ export default function ParentDashboard() {
           {[
             { id: 'overview', icon: '📊', label: 'Overview' },
             { id: 'performance', icon: '📈', label: 'Performance' },
-            { id: 'map-progress', icon: '🗺️', label: 'Map Progress' }, // 🌟 ADDED MAP ICON HERE
+            { id: 'map-progress', icon: '🗺️', label: 'Map Progress' }, 
             { id: 'activity', icon: '📝', label: 'Activity Log' },
             { id: 'profile', icon: '⚙️', label: 'Edit Profile' },
             { id: 'support', icon: '🎧', label: 'Help & Support' },
@@ -249,7 +246,7 @@ export default function ParentDashboard() {
           <div className="pd-topbar-title">Parent Dashboard</div>
           <div className="pd-topbar-right">
 
-            {/* 🌟 ECONOMY TOPBAR */}
+            {/* ECONOMY TOPBAR */}
             <div className="pd-economy-bar" onClick={() => setShowStore(true)} style={{ display: 'flex', gap: '15px', marginRight: '20px', cursor: 'pointer', background: '#f5f5f5', padding: '8px 15px', borderRadius: '20px', border: '1px solid #ddd', alignItems: 'center' }}>
               <div style={{ fontWeight: 'bold', color: '#FF9933' }}>🪙 {coins}</div>
               <div style={{ fontWeight: 'bold', color: '#06d6a0' }}>🗝️ {keys}</div>
@@ -278,10 +275,10 @@ export default function ParentDashboard() {
               setLbTimeRange={setLbTimeRange}
             />
           )}
-          {/* 🌟 PASSED TIME RANGE PROPS TO ACTIVITY */}
+          {/* PASSED TIME RANGE PROPS TO ACTIVITY */}
           {activeTab === 'activity' && <ActivityTab stats={stats} activityFilter={activityFilter} setActivityFilter={setActivityFilter} displayActivityLog={displayActivityLog} lbTimeRange={lbTimeRange} setLbTimeRange={setLbTimeRange} />}
 
-          {/* 🌟 PASS stateIdMap TO THE TAB */}
+          {/* PASS stateIdMap TO THE TAB */}
           {activeTab === 'map-progress' && <MapProgressTab mapLevelDetails={mapLevelDetails} stateIdMap={stateIdMap} />}
 
           {activeTab === 'profile' && (

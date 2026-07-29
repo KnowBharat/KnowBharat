@@ -29,7 +29,7 @@ export default function MapLevel({ levelMeta, stateInfo, onLevelComplete }) {
     buyKeyPack1, buyKeyPack2, buyKeyPack3,
     buyCombo1, buyCombo2
   } = useGameModal();
-  // 🌟 TIERED PRICING LOGIC
+  // TIERED PRICING LOGIC
   const getLevelCost = (num) => {
     if (num === 1) return 0;
     if (num >= 2 && num <= 4) return 7;
@@ -62,7 +62,7 @@ export default function MapLevel({ levelMeta, stateInfo, onLevelComplete }) {
       }).catch(err => console.error(err));
     }
 
-    // 🌟 Check for Level Progression (10 states)
+    // Check for Level Progression (10 states)
     if ((isUnlocked || levelMeta?.num === 1) && stateInfo?.id && levelMeta?.num) {
       const currentLevelExplored = unlockedNodes.filter(node => node.endsWith(` lvl ${levelMeta.num}`));
 
@@ -77,7 +77,7 @@ export default function MapLevel({ levelMeta, stateInfo, onLevelComplete }) {
 
   if (!stateInfo || !levelMeta) return null;
 
-  // 🌟 PRE-ACTION CHECK: Prompt user before spending coins
+  // PRE-ACTION CHECK: Prompt user before spending coins
   const promptUnlock = () => {
     if (coins < cost) {
       setCustomAlert({
@@ -103,7 +103,7 @@ export default function MapLevel({ levelMeta, stateInfo, onLevelComplete }) {
     }
   };
 
-  // 🌟 ASYNC UNLOCK: Deducts coins, saves to UI, and saves to DB instantly!
+  // ASYNC UNLOCK: Deducts coins, saves to UI, and saves to DB instantly!
   const executeUnlock = async (freeCost) => {
     const finalCost = freeCost !== undefined ? freeCost : confirmAction.cost;
     setConfirmAction(null);

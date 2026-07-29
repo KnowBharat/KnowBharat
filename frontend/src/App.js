@@ -2,13 +2,13 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 
-// 🌟 1. ALL STATIC IMPORTS AT THE VERY TOP
+// 1. ALL STATIC IMPORTS AT THE VERY TOP
 import Login from './Components/Login';
 import Register from './Components/Register';
 import { EconomyProvider, useEconomy } from './Hooks/EconomyContext';
 import './App.css';
 
-// 🌟 2. LAZY LOADED ROUTES (Declared after all imports)
+// 2. LAZY LOADED ROUTES (Declared after all imports)
 const ParentDashboard = lazy(() => import('./Components/ParentDashboard'));
 const Home = lazy(() => import('./Components/Home'));
 const SpellCheck = lazy(() => import('./Components/SpellIndex'));

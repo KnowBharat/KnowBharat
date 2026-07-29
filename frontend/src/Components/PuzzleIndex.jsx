@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import LevelPickerPage from './LevelPickerPage';
 import PuzzlePage from './PuzzlePage';
-import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals'; // 🌟 Added ConfirmActionModal
+import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals';
 import '../Css/Puzzle.css';
 import { apiFetch } from '../Hooks/useApi';
 import { useEconomy } from '../Hooks/EconomyContext';
@@ -39,7 +39,7 @@ export default function PuzzleIndex() {
   // Helper to extract the base level (e.g., 2.3 -> 2)
   const currentBaseLevel = Math.floor(puzzleUnlocked);
 
-  // 🌟 DYNAMIC LEVEL UNLOCK COST LOGIC
+  // DYNAMIC LEVEL UNLOCK COST LOGIC
   const getLevelUnlockCost = (levelNum) => {
     if (levelNum === 2 || levelNum === 3) return 9;
     if (levelNum === 4 || levelNum === 5) return 11;
@@ -55,7 +55,7 @@ export default function PuzzleIndex() {
       if (lvl.num > currentBaseLevel + 1) {
         setCustomAlert({ type: 'error', icon: '🔒', title: 'Level Locked', text: 'You must unlock previous levels first!' });
       } else {
-        // 🌟 Prepare Confirmation Modal for Keys
+        // Prepare Confirmation Modal for Keys
         const cost = getLevelUnlockCost(lvl.num);
         setConfirmAction({
           lvl: lvl, cost: cost,
@@ -70,7 +70,7 @@ export default function PuzzleIndex() {
     setActiveLevel(id);
   };
 
-  // 🌟 EXECUTE AFTER CONFIRMATION
+  // EXECUTE AFTER CONFIRMATION
   const executeConfirm = async () => {
     const { cost, lvl } = confirmAction;
     setConfirmAction(null); // Close modal
@@ -118,7 +118,7 @@ export default function PuzzleIndex() {
         )}
       </LevelPickerPage>
 
-      {/* 🌟 REPLACED HTML WITH SHARED COMPONENT */}
+      {/* REPLACED HTML WITH SHARED COMPONENT */}
       <ConfirmActionModal
         confirmAction={confirmAction}
         onConfirm={executeConfirm}

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../Css/Login.css';
 import { apiFetch } from '../Hooks/useApi';
-import { CustomAlertModal } from './SharedModals'; // 🌟 IMPORT REUSABLE MODAL
+import { CustomAlertModal } from './SharedModals'; 
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -18,7 +18,7 @@ export default function Login() {
   const [mode, setMode] = useState('login'); // 'login' | 'forgot' | 'reset'
   const [otp, setOtp] = useState('');
 
-  // 🌟 Custom Alert State
+  // Custom Alert State
   const [customAlert, setCustomAlert] = useState(null);
 
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ export default function Login() {
     setLoading(false);
 
     if (res && !res.error) {
-      // 🌟 Trigger the beautiful SweetAlert instead of native alert()
+      // Trigger the beautiful SweetAlert instead of native alert()
       setCustomAlert({
         type: 'success',
         icon: '✅',
@@ -74,7 +74,7 @@ export default function Login() {
     }
   };
 
-  // 🌟 Handler to close alert and execute specific actions (like switching to login view)
+  // Handler to close alert and execute specific actions (like switching to login view)
   const handleCloseAlert = () => {
     const action = customAlert?.onCloseAction;
     setCustomAlert(null);
@@ -85,7 +85,7 @@ export default function Login() {
 
   return (
     <div className="login-page">
-      {/* 🌟 Premium Floating Glass Shapes */}
+      {/* Premium Floating Glass Shapes */}
       <div className="lp-shape" />
       <div className="lp-shape" />
       <div className="lp-shape" />
@@ -95,7 +95,7 @@ export default function Login() {
       <div className="login-card">
         <div className="lp-badge">Parent Portal</div>
 
-        {/* 🌟 Flex container for Logo and Title side-by-side */}
+        {/* Flex container for Logo and Title side-by-side */}
         <div className="lp-header-group">
           <img
             src="/KnowBharat.webp"
@@ -191,7 +191,7 @@ export default function Login() {
         )}
       </div>
 
-      {/* 🌟 Custom SweetAlert Component */}
+      {/* Custom SweetAlert Component */}
       <CustomAlertModal alert={customAlert} onClose={handleCloseAlert} />
     </div>
   );

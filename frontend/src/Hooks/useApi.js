@@ -1,5 +1,5 @@
 import { API_BASE_URL } from './config';
-const BASE = `${API_BASE_URL}/api/auth`; // 🌟 Restored to /auth
+const BASE = `${API_BASE_URL}/api/auth`; 
 
 function authHeaders() {
   const token = localStorage.getItem('token');
@@ -29,13 +29,13 @@ export async function trackScore(game, score, stateName = null) {
   const userId = localStorage.getItem("userId");
   if (!userId) return null;
 
-  // 🌟 1. Save to GameScore table (Updates Leaderboard, Performance, and Total Score)
+  // 1. Save to GameScore table (Updates Leaderboard, Performance, and Total Score)
   apiFetch(`/game-data/score/${userId}`, {
     method: 'POST',
     body: JSON.stringify({ game, score, stateName }),
   }).catch(err => console.error("Failed to save score:", err));
 
-  // 🌟 2. Save to GameActivity table (Updates the Recent Activity Log)
+  // 2. Save to GameActivity table (Updates the Recent Activity Log)
   return apiFetch(`/game-data/activity/${userId}`, {
     method: 'POST',
     body: JSON.stringify({ game, score, stateName }),

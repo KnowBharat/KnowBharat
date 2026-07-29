@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import LevelPickerPage from './LevelPickerPage';
 import QuizGame from './QuizGame';
-import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals'; // 🌟 Added ConfirmActionModal
+import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals'; // Added ConfirmActionModal
 import '../Css/Quiz.css';
 import { apiFetch } from '../Hooks/useApi';
 import { useEconomy } from '../Hooks/EconomyContext';
@@ -43,7 +43,7 @@ export default function QuizIndex() {
   // Helper to extract the base level (e.g., 2.3 -> 2)
   const currentBaseLevel = Math.floor(quizUnlocked);
 
-  // 🌟 DYNAMIC LEVEL UNLOCK COST LOGIC (Slightly more expensive than Matching!)
+  // DYNAMIC LEVEL UNLOCK COST LOGIC (Slightly more expensive than Matching!)
   const getLevelUnlockCost = (levelNum) => {
     if (levelNum >= 2 && levelNum <= 4) return 13; // Matching was 11
     if (levelNum >= 5 && levelNum <= 7) return 15; // Matching was 13
@@ -59,7 +59,7 @@ export default function QuizIndex() {
       if (lvl.num > currentBaseLevel + 1) {
         setCustomAlert({ type: 'error', icon: '🔒', title: 'Level Locked', text: 'You must unlock previous levels first!' });
       } else {
-        // 🌟 Prepare Confirmation Modal for Keys
+        // Prepare Confirmation Modal for Keys
         const cost = getLevelUnlockCost(lvl.num);
         setConfirmAction({
           lvl: lvl, cost: cost,
@@ -74,7 +74,7 @@ export default function QuizIndex() {
     setActiveLevel(id);
   };
 
-  // 🌟 EXECUTE AFTER CONFIRMATION
+  // EXECUTE AFTER CONFIRMATION
   const executeConfirm = async () => {
     const { cost, lvl } = confirmAction;
     setConfirmAction(null); // Close modal
@@ -120,7 +120,7 @@ export default function QuizIndex() {
         )}
       </LevelPickerPage>
 
-      {/* 🌟 REPLACED HTML WITH SHARED COMPONENT */}
+      {/* REPLACED HTML WITH SHARED COMPONENT */}
       <ConfirmActionModal
         confirmAction={confirmAction}
         onConfirm={executeConfirm}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import LevelPickerPage from './LevelPickerPage';
 import MatchingGame from './MatchingGame';
-import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals'; // 🌟 Added ConfirmActionModal
+import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals'; 
 import '../Css/MatchingGame.css';
 import { apiFetch } from '../Hooks/useApi';
 import { useEconomy } from '../Hooks/EconomyContext'; 
@@ -43,7 +43,7 @@ export default function MatchingIndex() {
   const currentBaseLevel = Math.floor(matchingUnlocked);
   const activeMeta = LEVELS.find(l => l.id === activeLevel);
 
-  // 🌟 DYNAMIC LEVEL UNLOCK COST LOGIC (Slightly more expensive than Puzzle!)
+  // DYNAMIC LEVEL UNLOCK COST LOGIC (Slightly more expensive than Puzzle!)
   const getLevelUnlockCost = (levelNum) => {
     if (levelNum === 2 || levelNum === 3) return 11; // Puzzle was 9
     if (levelNum >= 4 && levelNum <= 6) return 13;   // Puzzle was 11
@@ -59,7 +59,7 @@ export default function MatchingIndex() {
       if (lvl.num > currentBaseLevel + 1) {
         setCustomAlert({ type: 'error', icon: '🔒', title: 'Level Locked', text: 'You must unlock previous levels first!' });
       } else {
-        // 🌟 Prepare Confirmation Modal for Keys
+        // Prepare Confirmation Modal for Keys
         const cost = getLevelUnlockCost(lvl.num);
         setConfirmAction({
             lvl: lvl, cost: cost,
@@ -74,7 +74,7 @@ export default function MatchingIndex() {
     setActiveLevel(id);
   };
 
-  // 🌟 EXECUTE AFTER CONFIRMATION
+  // EXECUTE AFTER CONFIRMATION
   const executeConfirm = async () => {
     const { cost, lvl } = confirmAction;
     setConfirmAction(null); // Close modal
@@ -121,7 +121,6 @@ export default function MatchingIndex() {
         )}
       </LevelPickerPage>
 
-      {/* 🌟 REPLACED HTML WITH SHARED COMPONENT */}
       <ConfirmActionModal 
         confirmAction={confirmAction} 
         onConfirm={executeConfirm} 

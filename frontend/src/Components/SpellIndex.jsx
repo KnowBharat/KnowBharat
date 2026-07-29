@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import LevelPickerPage from './LevelPickerPage';
 import SpellCheck from './SpellCheck';
-import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals'; // 🌟 Added ConfirmActionModal
+import { CustomAlertModal, StoreModal, ConfirmActionModal } from './SharedModals'; 
 import '../Css/SpellCheck.css';
 import { apiFetch } from '../Hooks/useApi';
 import { useEconomy } from '../Hooks/EconomyContext';
@@ -41,7 +41,7 @@ export default function SpellIndex() {
   // Helper to extract the base level (e.g., 2.3 -> 2)
   const currentBaseLevel = Math.floor(spellUnlocked);
 
-  // 🌟 DYNAMIC LEVEL UNLOCK COST LOGIC (Scaled slightly higher than Quiz)
+  // DYNAMIC LEVEL UNLOCK COST LOGIC (Scaled slightly higher than Quiz)
   const getLevelUnlockCost = (levelNum) => {
     if (levelNum === 2 || levelNum === 3) return 15;
     if (levelNum >= 4 && levelNum <= 6) return 17;
@@ -57,7 +57,7 @@ export default function SpellIndex() {
       if (lvl.num > currentBaseLevel + 1) {
         setCustomAlert({ type: 'error', icon: '🔒', title: 'Level Locked', text: 'You must unlock previous levels first!' });
       } else {
-        // 🌟 Prepare Confirmation Modal for Keys
+        // Prepare Confirmation Modal for Keys
         const cost = getLevelUnlockCost(lvl.num);
         setConfirmAction({
           lvl: lvl, cost: cost,
@@ -72,7 +72,7 @@ export default function SpellIndex() {
     setActiveLevel(id);
   };
 
-  // 🌟 EXECUTE AFTER CONFIRMATION
+  // EXECUTE AFTER CONFIRMATION
   const executeConfirm = async () => {
     const { cost, lvl } = confirmAction;
     setConfirmAction(null); // Close modal
@@ -118,7 +118,6 @@ export default function SpellIndex() {
         )}
       </LevelPickerPage>
 
-      {/* 🌟 REPLACED HTML WITH SHARED COMPONENT */}
       <ConfirmActionModal
         confirmAction={confirmAction}
         onConfirm={executeConfirm}

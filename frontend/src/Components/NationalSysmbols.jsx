@@ -53,23 +53,22 @@ export default function NationalSymbols() {
 
     // 2. Fetch Unlocked Symbols
     if (userId) {
-  // 🌟 FIX: Added '/auth' to the path so it matches the secured controller
-  fetch(`${BASE}/auth/progress/symbols/${userId}`) 
-    .then(res => res.ok ? res.json() : [])
-    .then(savedSymbols => {
-      if (savedSymbols && Array.isArray(savedSymbols) && savedSymbols.length > 0) {
-        setUnlockedSymbols(savedSymbols); 
-      }
-    })
-    .catch(err => console.error("Could not fetch saved symbols:", err));
-}
+      fetch(`${BASE}/auth/progress/symbols/${userId}`) 
+        .then(res => res.ok ? res.json() : [])
+        .then(savedSymbols => {
+          if (savedSymbols && Array.isArray(savedSymbols) && savedSymbols.length > 0) {
+            setUnlockedSymbols(savedSymbols); 
+          }
+        })
+        .catch(err => console.error("Could not fetch saved symbols:", err));
+    }
   }, [userId]);
 
   const filtered = activeCategory === 'All'
     ? symbolsData
     : symbolsData.filter(s => s.category === activeCategory);
 
-  // 🌟 PRE-ACTION CHECK: Prompt before spending coins
+  // Prompt before spending coins
   const promptUnlockSymbol = (sym) => {
     if (coins < 7) {
       setCustomAlert({ type: 'warning', icon: '🪙', title: 'Out of Coins!', text: 'You need 7 Coins to unlock this symbol! \nVisit the Store to get more.' });
@@ -88,7 +87,7 @@ export default function NationalSymbols() {
     });
   };
 
-  // 🌟 MASTER EXECUTE FUNCTION: Handles both Unlocking Symbols and Leveling Up
+  // Handles both Unlocking Symbols and Leveling Up
   const executeConfirm = async () => {
     const action = confirmAction;
     setConfirmAction(null); // Close modal
@@ -250,7 +249,6 @@ const isOpen = expanded === sym.id;
         </div>
       )}
 
-      {/* 🌟 REPLACED INLINE HTML WITH SHARED COMPONENT */}
       <ConfirmActionModal 
         confirmAction={confirmAction} 
         onConfirm={executeConfirm} 

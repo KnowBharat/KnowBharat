@@ -92,7 +92,7 @@ export function StoreModal({
       
       <div style={{ maxHeight: '65vh', overflowY: 'auto', paddingRight: '5px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
         
-        {/* 🌟 FREE REWARDS */}
+        {/* FREE REWARDS */}
         <div>
           <div style={{ textAlign: 'left', fontWeight: 'bold', color: '#888', borderBottom: '2px solid #eee', paddingBottom: '5px', marginBottom: '10px' }}>Free Rewards</div>
           <button onClick={handleDailyClick} disabled={!canClaimDaily} style={{ width: '100%', padding: '12px', borderRadius: '12px', border: canClaimDaily ? '2px solid #ffc107' : '2px solid #e0e0e0', background: canClaimDaily ? '#fff8e1' : '#f5f5f5', cursor: canClaimDaily ? 'pointer' : 'not-allowed', marginBottom: '10px' }}>
@@ -108,7 +108,7 @@ export function StoreModal({
           </div>
         </div>
 
-        {/* 🌟 PAID ITEMS (Parents Only) */}
+        {/* PAID ITEMS (Parents Only) */}
         {isParent && (
           <>
             {/* Coins */}
@@ -176,7 +176,7 @@ export function UnlockModal({ modalData, onConfirm, onCancel }) {
 }
 
 /**
- * 🌟 5. ConfirmActionModal: NEW! The unified SweetAlert-style modal for asking to spend currency.
+ * 5. ConfirmActionModal: NEW! The unified SweetAlert-style modal for asking to spend currency.
  */
 export function ConfirmActionModal({ confirmAction, onConfirm, onCancel }) {
   if (!confirmAction) return null;

@@ -123,7 +123,7 @@ const {
     return spellFloatVal >= requiredVal;
   };
 
-  // 🌟 NEW: Dynamic Subtitle Text for the Menu!
+  // Dynamic Subtitle Text for the Menu!
   const getRoundSub = (rIdx) => {
     if (rIdx === 0) return 'Pre-filled Letters';
     if (rIdx === 1) return 'Scrambled Tiles';
@@ -131,7 +131,7 @@ const {
     return '';
   };
 
-  // 🌟 NEW: Logical switch. Early levels never use the full keyboard!
+  // Logical switch. Early levels never use the full keyboard!
   const useScrambled = roundIdx < 2 || levelNum <= 4;
 
   useEffect(() => {
@@ -319,7 +319,7 @@ const {
     newAnswer[i] = '';
     setUserAnswer(newAnswer);
     
-    // 🌟 Conditionally return tiles based on `useScrambled`
+    // Conditionally return tiles based on `useScrambled`
     if (useScrambled) setShuffledLetters(prev => [...prev, letter]);
   };
 
@@ -339,7 +339,7 @@ const {
     newAnswer[pick] = ch;
     newHints.push(pick);
 
-    // 🌟 Conditionally handle hint tiles based on `useScrambled`
+    // Conditionally handle hint tiles based on `useScrambled`
     if (useScrambled) {
         const si = newShuffled.indexOf(ch);
         if (si !== -1) newShuffled.splice(si, 1);
@@ -498,7 +498,7 @@ const {
     );
   }
 
-  // 🌟 FAIL PHASE
+  // FAIL PHASE
   if (phase === 'round-fail') {
     const displayPlayCost = roundPlayCost === 0 ? 'Free' : `🪙 ${roundPlayCost}`;
     return (
@@ -601,7 +601,7 @@ const {
             </div>
             <div className="sp-tiles" style={{marginTop: '20px'}}>
               
-              {/* 🌟 SCRAMBLED vs KEYBOARD RENDER LOGIC */}
+              {/* SCRAMBLED vs KEYBOARD RENDER LOGIC */}
               {useScrambled ? (
                   shuffledLetters.map((letter, i) => (
                     <button key={i} className="sp-tile" style={{ '--tc': roundMeta.color }} onClick={() => handleLetterClick(letter, i)} disabled={!!result}>

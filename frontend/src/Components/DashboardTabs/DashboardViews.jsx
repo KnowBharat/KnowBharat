@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GAME_META } from './DashboardConstants';
 
-// 🌟 Expanded map to translate both shortcodes AND full lowercase strings!
+// Expanded map to translate both shortcodes AND full lowercase strings!
 const EXTENDED_STATE_MAP = { 
   "AP": "Andhra Pradesh", "AR": "Arunachal Pradesh", "AS": "Assam", "BR": "Bihar", "CG": "Chhattisgarh", "GA": "Goa", "GJ": "Gujarat", "HR": "Haryana", "HP": "Himachal Pradesh", "JH": "Jharkhand", "KA": "Karnataka", "KL": "Kerala", "MP": "Madhya Pradesh", "MH": "Maharashtra", "MN": "Manipur", "ML": "Meghalaya", "MZ": "Mizoram", "NL": "Nagaland", "OD": "Odisha", "PB": "Punjab", "RJ": "Rajasthan", "SK": "Sikkim", "TN": "Tamil Nadu", "TG": "Telangana", "TR": "Tripura", "UP": "Uttar Pradesh", "UK": "Uttarakhand", "WB": "West Bengal", "AN": "Andaman & Nicobar", "CH": "Chandigarh", "DN": "Dadra & Nagar Haveli", "DD": "Daman & Diu", "DL": "Delhi", "JK": "Jammu & Kashmir", "LA": "Ladakh", "LD": "Lakshadweep", "PY": "Puducherry",
   "himachalpradesh": "Himachal Pradesh", "rajasthan": "Rajasthan", "uttarpradesh": "Uttar Pradesh", "andhrapradesh": "Andhra Pradesh", "maharashtra": "Maharashtra", "gujarat": "Gujarat", "chhattisgarh": "Chhattisgarh", "odisha": "Odisha", "karnataka": "Karnataka", "tamilnadu": "Tamil Nadu", "jammuandkashmir": "Jammu & Kashmir"
@@ -17,7 +17,7 @@ const formatStateName = (code) => {
 export const OverviewTab = ({ stats, heatmapData, globalLeaderboard, lbTimeRange, setLbTimeRange, setActiveTab, viewDetailsInLog, mapLevelDetails, onOwnProfileClick }) => {
   const userId = localStorage.getItem("userId");
   
-  // 🌟 Capitalizes the current time range for the labels!
+  // Capitalizes the current time range for the labels!
   const timeLabel = lbTimeRange.charAt(0).toUpperCase() + lbTimeRange.slice(1);
 
   return (
@@ -160,10 +160,9 @@ export const OverviewTab = ({ stats, heatmapData, globalLeaderboard, lbTimeRange
 
 // ─── 2. PERFORMANCE TAB ──────────────────────────────────────────────────────
 export const PerformanceTab = ({ stats, lbTimeRange, setLbTimeRange }) => { 
-  // 🌟 FIX: Reset this back to 'all' so it shows all games by default
+  // Reset this back to 'all' so it shows all games by default
   const [gameFilter, setGameFilter] = useState('all'); 
   
-  // 🌟 FIX: Removed the extra "=" 
   const timeLabel = lbTimeRange.charAt(0).toUpperCase() + lbTimeRange.slice(1);
   const scoreHistory = stats.scoreHistory || [];
 
@@ -448,7 +447,6 @@ export const SupportTab = ({ feedbackText, setFeedbackText, handleFeedbackSubmit
 );
 
 // ─── 6. MAP PROGRESS TAB ─────────────────────────────────────────────────────
-// 🌟 ADD stateIdMap as a prop here
 export const MapProgressTab = ({ mapLevelDetails, stateIdMap }) => {
   return (
     <div className="pd-grid">
@@ -476,7 +474,7 @@ export const MapProgressTab = ({ mapLevelDetails, stateIdMap }) => {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                       {exploredList.map(code => (
                         <span key={code} style={{ background: 'white', border: '1px solid #ddd', padding: '6px 12px', borderRadius: '8px', fontSize: '0.9rem', color: '#333', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                          {/* 🌟 CHECK THE DICTIONARY FOR THE NAME! */}
+                          {/* CHECK THE DICTIONARY FOR THE NAME! */}
                           ✅ {stateIdMap && stateIdMap[code] ? stateIdMap[code] : formatStateName(code)}
                         </span>
                       ))}

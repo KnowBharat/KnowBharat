@@ -133,7 +133,7 @@ export default function KidsHome() {
     setParentPassword('');
   };
 
-  // 🌟 NEW: Handle Forgot Password OTP Request
+  // Handle Forgot Password OTP Request
   const handleForgotPassRequest = async (e) => {
     e.preventDefault();
     const res = await apiFetch('/forgot-password-otp', { method: 'POST', body: JSON.stringify({ email: resetEmail }) });
@@ -144,7 +144,7 @@ export default function KidsHome() {
     }
   };
 
-  // 🌟 NEW: Handle Reset Password Submit
+  // Handle Reset Password Submit
   const handleResetPassSubmit = async (e) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
@@ -213,7 +213,7 @@ export default function KidsHome() {
             </form>
           )}
 
-          {/* 🌟 NEW: FORGOT PASSWORD FORM */}
+          {/* FORGOT PASSWORD FORM */}
           {parentAuthMode === 'forgot' && (
             <form className="auth-modal" onSubmit={handleForgotPassRequest}>
               <h2>Reset Password</h2>
@@ -226,7 +226,7 @@ export default function KidsHome() {
             </form>
           )}
 
-          {/* 🌟 NEW: OTP AND RESET FORM */}
+          {/* OTP AND RESET FORM */}
           {parentAuthMode === 'reset' && (
             <form className="auth-modal" onSubmit={handleResetPassSubmit}>
               <h2>Enter OTP</h2>

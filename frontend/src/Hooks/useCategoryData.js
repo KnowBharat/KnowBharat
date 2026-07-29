@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { API_BASE_URL } from './config'; // 🌟 Centralized URL
+import { API_BASE_URL } from './config'; 
 
 export default function useCategoryData(category, stateId, fetchAll = false) {
   const [data, setData] = useState(fetchAll ? [] : null);

@@ -129,7 +129,7 @@ export default function MapIndex() {
       return;
     }
     if (id > mapUnlocked) {
-      // 🌟 Trigger Confirmation Modal for unlocking
+      // Trigger Confirmation Modal for unlocking
       setConfirmAction({
         type: 'unlock',
         id: lvl.id,
@@ -147,7 +147,7 @@ export default function MapIndex() {
     }
   };
 
-  // 🌟 Master function handling BOTH unlocking and level-ups
+  // Master function handling BOTH unlocking and level-ups
   const executeConfirm = async () => {
     const action = confirmAction;
     setConfirmAction(null);
@@ -258,7 +258,7 @@ export default function MapIndex() {
         </div>
       </LevelPickerPage>
 
-      {/* 🌟 REPLACED HTML AND OLD UNLOCK MODAL WITH UNIFIED SHARED MODAL */}
+      {/* REPLACED HTML AND OLD UNLOCK MODAL WITH UNIFIED SHARED MODAL */}
       <ConfirmActionModal
         confirmAction={confirmAction}
         onConfirm={executeConfirm}

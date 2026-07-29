@@ -28,7 +28,7 @@ const LEVEL_NUMS = {
   'festival': 5, 'place': 6, 'wear': 7, 'established': 8, 'mix': 9
 };
 
-// 🌟 KEYS: Cost to unlock early (1.1 is never locked)
+// KEYS: Cost to unlock early (1.1 is never locked)
 const getRoundKeyCost = (cat, levelNum, rIdx) => {
   if (levelNum === 1 && rIdx === 0) return 0; // 1.1 is ALWAYS FREE                 
   if (cat === 'symbols') return 1;
@@ -38,9 +38,9 @@ const getRoundKeyCost = (cat, levelNum, rIdx) => {
   return 2;
 };
 
-// 🌟 COINS: Cost to play (1.1 is Free, rest cost coins)
+// COINS: Cost to play (1.1 is Free, rest cost coins)
 const getRoundCoinCost = (cat, levelNum, rIdx) => {
-  if (levelNum === 1 && rIdx === 0) return 0; // 🌟 1.1 is ALWAYS FREE
+  if (levelNum === 1 && rIdx === 0) return 0; // 1.1 is ALWAYS FREE
   if (cat === 'symbols') return [11, 11, 11][rIdx]; // Fallback for 1.2 and 1.3
   if (cat === 'capital' || cat === 'language') return [11, 11, 13][rIdx];
   if (cat === 'food' || cat === 'festival' || cat === 'place') return [11, 13, 13][rIdx];

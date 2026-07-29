@@ -1,4 +1,3 @@
-// Components/LevelPickerPage.jsx
 import React from 'react';
 import '../Css/LevelPickerPage.css';
 
@@ -33,7 +32,7 @@ export default function LevelPickerPage({
 
       <div className="lpp-grid">
         {levels.map((lvl, i) => {
-          // 🐛 FIX: Use lvl.num for math (since Puzzle IDs are strings like 'map', 'food')
+          // Use lvl.num for math (since Puzzle IDs are strings like 'map', 'food')
           const levelNumber = lvl.num || lvl.id; 
           
           const isUnlocked = levelNumber <= unlockedLevel;
@@ -45,7 +44,6 @@ export default function LevelPickerPage({
               key={lvl.id}
               className={`lpp-card ${lvl.dark ? 'dark' : ''} ${!isUnlocked ? 'locked-card' : ''} ${isHardLocked ? 'hard-locked' : ''}`}
               style={{
-                // 🌟 FIX: Force grayscale backgrounds directly on the component if locked!
                 background: lvl.dark ? undefined : lvl.bg,
 borderColor: lvl.border,
                 animationDelay: `${i * 0.055}s`,
@@ -64,10 +62,10 @@ borderColor: lvl.border,
                 </div>
               )}
 
-              {/* 🌟 Change number badge color to gray if locked */}
+              {/* Change number badge color to gray if locked */}
               <span className="lpp-card-num" style={{ background: isUnlocked ? lvl.color : '#aaaaaa' }}>{lvl.num}</span>
 
-              {/* 🌟 Change tag colors to gray if locked */}
+              {/* Change tag colors to gray if locked */}
               <span className="lpp-card-tag"
                 style={{
                   color: isUnlocked ? lvl.tagColor : '#777777',
@@ -77,12 +75,12 @@ borderColor: lvl.border,
                 {lvl.tag}
               </span>
 
-              {/* 🌟 Apply grayscale to emoji if locked */}
+              {/* Apply grayscale to emoji if locked */}
               <div className="lpp-card-emoji" style={{ filter: isUnlocked ? 'drop-shadow(0 3px 5px rgba(0,0,0,0.14))' : 'grayscale(100%) opacity(0.6)' }}>
                 {lvl.emoji}
               </div>
 
-              {/* 🌟 Title and description colors adjusted for locked state */}
+              {/* Title and description colors adjusted for locked state */}
               <div className="lpp-card-title" style={{ color: isUnlocked ? lvl.tagColor : '#666666' }}>
                 {lvl.title}
               </div>
