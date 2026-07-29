@@ -30,7 +30,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Define allowed origins (your React app)
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000",
+                "https://know-bharat.vercel.app"));
 
         // Define allowed methods (Added DELETE and OPTIONS for standard web behavior)
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT"));
