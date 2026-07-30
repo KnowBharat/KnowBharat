@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
+import { buildApiUrl } from './config';
 
 export default function useWearData(stateId, fetchAll = false) {
   const [wears, setWears] = useState(fetchAll ? [] : null);
 
   useEffect(() => {
     const url = fetchAll
-      ? `http://localhost:8081/wears/all`
+      ? buildApiUrl('/wears/all')
       : stateId
-      ? `http://localhost:8081/wears/wear/${stateId}`
+      ? buildApiUrl(`/wears/wear/${stateId}`)
       : null;
 
     if (!url) return;

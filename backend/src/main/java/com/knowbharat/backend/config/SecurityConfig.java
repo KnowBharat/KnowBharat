@@ -29,20 +29,16 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Define allowed origins (your React app)
-        configuration.setAllowedOrigins(List.of("http://localhost:3000",
-                "https://know-bharat.vercel.app"));
+        configuration.setAllowedOriginPatterns(List.of(
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "https://*.vercel.app"
+        ));
 
-        // Define allowed methods (Added DELETE and OPTIONS for standard web behavior)
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT"));
-
-        // Allow all headers
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-
-        // Allow credentials (cookies, authorization headers, etc.)
         configuration.setAllowCredentials(true);
 
-        // Apply this configuration to ALL endpoints in your app ("/**")
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 

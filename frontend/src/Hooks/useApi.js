@@ -1,5 +1,5 @@
-import { API_BASE_URL } from './config';
-const BASE = `${API_BASE_URL}/api/auth`; 
+import { buildApiUrl } from './config';
+const BASE = buildApiUrl('/api/auth');
 
 function authHeaders() {
   const token = localStorage.getItem('token');

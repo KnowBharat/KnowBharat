@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { API_BASE_URL } from './config'; 
+import { buildApiUrl } from './config'; 
 
 export default function useCategoryData(category, stateId, fetchAll = false) {
   const [data, setData] = useState(fetchAll ? [] : null);
@@ -7,8 +7,8 @@ export default function useCategoryData(category, stateId, fetchAll = false) {
   useEffect(() => {
     const singular = category.slice(0, -1); 
     const url = fetchAll
-      ? `${API_BASE_URL}/${category}/all`
-      : stateId ? `${API_BASE_URL}/${category}/${singular}/${stateId}` : null;
+      ? buildApiUrl(`/${category}/all`)
+      : stateId ? buildApiUrl(`/${category}/${singular}/${stateId}`) : null;
 
     if (!url) return;
 

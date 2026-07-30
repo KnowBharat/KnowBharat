@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
+import { buildApiUrl } from './config';
 
 export default function useFestivalData(stateId, fetchAll = false) {
   const [festivals, setFestivals] = useState([]);
 
   useEffect(() => {
     const url = fetchAll
-      ? `http://localhost:8081/festivals/all`
+      ? buildApiUrl('/festivals/all')
       : stateId
-      ? `http://localhost:8081/festivals/festival/${stateId}`
+      ? buildApiUrl(`/festivals/festival/${stateId}`)
       : null;
 
     if (!url) return;

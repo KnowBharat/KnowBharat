@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
+import { buildApiUrl } from './config';
 
 export default function usePlaceData(stateId, fetchAll = false) {
   const [places, setPlaces] = useState([]);
 
   useEffect(() => {
     const url = fetchAll
-      ? `http://localhost:8081/places/all`
+      ? buildApiUrl('/places/all')
       : stateId
-      ? `http://localhost:8081/places/place/${stateId}`
+      ? buildApiUrl(`/places/place/${stateId}`)
       : null;
 
     if (!url) return;
