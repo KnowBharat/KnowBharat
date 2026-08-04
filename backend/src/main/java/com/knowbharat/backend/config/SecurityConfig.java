@@ -32,6 +32,7 @@ public class SecurityConfig {
         configuration.setAllowedOriginPatterns(List.of(
                 "http://localhost:3000",
                 "http://localhost:3001",
+                "https://know-bharat.vercel.app",
                 "https://*.vercel.app"
         ));
 
